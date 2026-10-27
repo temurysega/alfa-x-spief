@@ -29,9 +29,10 @@ function objClass(shape: Shape, color: Color) {
 }
 
 // Пара 3D-объектов: большой и маленький, разных форм и цветов (правило дизайн-системы).
-export function Pair({ big, small, size }: { big: [Shape, Color]; small: [Shape, Color]; size: number }) {
+// Размер пары задаёт CSS (.hero .ai-pair), чтобы на низких экранах она уменьшалась.
+export function Pair({ big, small }: { big: [Shape, Color]; small: [Shape, Color] }) {
   return (
-    <div className="ai-pair ai-play" style={{ '--ps': `${size}px` } as CSSProperties}>
+    <div className="ai-pair ai-play">
       <div className={objClass(...big)} />
       <div className={objClass(...small)} style={{ '--fd': '-3.5s' } as CSSProperties} />
     </div>

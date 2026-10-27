@@ -47,7 +47,7 @@ export function Join({ notice, onJoined, onLogin }: {
     <Screen>
       <Bar />
       <div className="hero">
-        <Pair big={['star', 'red']} small={['sphere', 'pink']} size={200} />
+        <Pair big={['star', 'red']} small={['sphere', 'pink']} />
       </div>
       <div>
         <h1 className="title">Квиз начинается</h1>

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CodeReveal, Join, Login, NoStorage } from './Entry';
 import { Game } from './Game';
 import { clearToken, loadToken, storageWorks } from './storage';
@@ -15,6 +15,12 @@ export function Player() {
   const [stage, setStage] = useState<Stage>(() =>
     token ? { kind: 'game' } : storageWorks() ? { kind: 'join' } : { kind: 'nostorage' },
   );
+
+  // Новый экран — с самого верха, иначе на маленьком телефоне остаётся прокрутка прошлого.
+  // Фигурные скобки обязательны: в новых Chrome scrollTo возвращает Promise, и React принял бы его за функцию очистки.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [stage.kind]);
 
   const onRemoved = useCallback(() => {
     clearToken();

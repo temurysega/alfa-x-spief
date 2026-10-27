@@ -101,6 +101,12 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
 
   useTicker(snap?.phase === 'countdown' || snap?.phase === 'question');
 
+  // Новый вопрос или новый экран — прокрутка наверх. Показ ответа того же вопроса страницу не дёргает.
+  const screenKey = snap?.phase === 'question' || snap?.phase === 'revealed' ? `q${snap.questionId}` : snap?.phase;
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [screenKey]);
+
   // Картинка начинает грузиться во время отсчёта.
   useEffect(() => {
     if (snap?.image) new Image().src = snap.image;
@@ -157,7 +163,7 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
         </div>
         {offline}
         <div className="hero">
-          <Pair big={['spark', 'red']} small={['sphere', 'ink']} size={200} />
+          <Pair big={['spark', 'red']} small={['sphere', 'ink']} />
         </div>
         <div>
           <h1 className="title">Ты в игре</h1>
@@ -177,7 +183,7 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
         </div>
         {offline}
         <div className="hero">
-          <Pair big={['star', 'red']} small={['spark', 'ink']} size={200} />
+          <Pair big={['star', 'red']} small={['spark', 'ink']} />
         </div>
         <div>
           <h1 className="title">Спасибо!</h1>

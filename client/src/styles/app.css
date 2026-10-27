@@ -20,6 +20,7 @@ button { font-family: inherit; }
 .stack { display: flex; flex-direction: column; gap: 14px; }
 
 .hero { display: grid; place-items: center; padding: 8px 0; }
+.hero .ai-pair { --ps: 200px; }
 .title { font: 600 34px/1.02 var(--font-display); letter-spacing: -0.03em; margin: 0; text-wrap: balance; }
 .sub { margin: 10px 0 0; color: var(--ink-muted); font-size: 19px; line-height: 1.4; }
 .nick { display: inline-flex; align-items: center; gap: 8px; font: 500 15px/1 var(--font-mono); color: var(--ink-muted); min-width: 0; overflow-wrap: anywhere; }
@@ -44,19 +45,23 @@ button { font-family: inherit; }
 .countdown { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18vh 0 0; }
 .countdown__num { font: 700 180px/.9 var(--font-display); letter-spacing: -0.04em; color: var(--red); animation: ai-flash .6s cubic-bezier(.3,1.4,.5,1) both; }
 
-.question-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 34px; }
+.question-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
 .ai-qimage img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .ai-option__text { min-width: 0; overflow-wrap: anywhere; }
 
-/* Низкие экраны (iPhone SE и похожие): пять вариантов с картинкой — почти без прокрутки. */
+/* Низкие экраны (iPhone SE, Android 360×640): пять длинных вариантов с картинкой
+   помещаются без прокрутки. Размеры шрифтов — не меньше минимума дизайн-системы. */
 @media (max-height: 720px) {
-  .screen { gap: 10px; }
-  .ai-qimage { height: 112px; }
-  .ai-question { font-size: 21px; }
-  .ai-options { gap: 8px; }
-  .ai-option { min-height: 54px; padding: 5px 12px 5px 5px; }
-  .ai-option__key { width: 42px; height: 42px; font-size: 19px; }
-  .ai-timer { width: 48px; height: 48px; }
+  .screen { gap: 8px; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .hero { padding: 0; }
+  .hero .ai-pair { --ps: 128px; }
+  .title { font-size: 30px; }
+  .ai-qimage { height: 96px; }
+  .ai-question { font-size: 20px; line-height: 1.2; }
+  .ai-options { gap: 6px; }
+  .ai-option { min-height: 52px; padding: 4px 10px 4px 5px; gap: 10px; line-height: 1.2; }
+  .ai-option__key { width: 40px; height: 40px; font-size: 18px; }
+  .ai-timer { width: 46px; height: 46px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
