@@ -1,0 +1,23 @@
+{
+  "name": "alfa-quiz-server",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/index.ts",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "typecheck": "tsc",
+    "bots": "node tools/bots.ts"
+  },
+  "dependencies": {
+    "fastify": "^5.6.1",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "@types/pg": "^8.15.5",
+    "typescript": "^5.9.3"
+  }
+}

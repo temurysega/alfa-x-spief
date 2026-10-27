@@ -1,0 +1,48 @@
+# Имя проекта зафиксировано: тома называются alfa-quiz_db и alfa-quiz_data,
+# даже если папку переименуют. Иначе стек поднимется на пустой базе.
+name: alfa-quiz
+
+services:
+  db:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: quiz
+      POSTGRES_USER: quiz
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?задай DB_PASSWORD в .env}
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quiz -d quiz"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  server:
+    build: ./server
+    environment:
+      DATABASE_URL: postgres://quiz:${DB_PASSWORD}@db:5432/quiz
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?задай ADMIN_PASSWORD в .env}
+      DATA_DIR: /data
+    volumes:
+      - data:/data
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "${PORT:-8080}:80"
+    volumes:
+      - data:/data:ro
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  db:
+  data:

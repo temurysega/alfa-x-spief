@@ -1,0 +1,14 @@
+node_modules/
+dist/
+data/
+.env
+*.log
+
+# локальные настройки редакторов и ИИ-агентов — не в репозиторий
+.claude/
+CLAUDE.md
+.cursor/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

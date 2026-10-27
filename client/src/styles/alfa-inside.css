@@ -1,0 +1,368 @@
+/* ALFA INSIDE · выжимка из дизайн-системы Софьи (alfa-inside.css) — только то, что нужно квизу.
+   Источник правды — исходный alfa-inside.css. Шрифты подключаются локально в fonts.css, без Google Fonts.
+   Из 3D-объектов оставлены искра, звезда и шар: цветок весит 35 КБ и квизу не нужен. */
+
+/* ---------- ТОКЕНЫ: цвета (светлая и тёмная тема), отступы, радиусы, шрифты ---------- */
+:root, [data-theme="light"] {
+  --paper: #faf7f5;  /* Основной фон: слайды, посты, страницы, квиз. Тёплый белый, не чистый #fff. */
+  --surface: #f1ece9;  /* Второй уровень: карточки, плашки, варианты ответа. Отделяет блок от фона без рамки и тени. */
+  --surface-strong: #e6dfdb;  /* Наведение на карточку или вариант ответа, место под фото и скриншот. */
+  --line: #e4ddd9;  /* Тонкие разделительные линии. Только декор, не граница элемента управления. */
+  --line-strong: #8a7f7b;  /* Граница полей ввода и контурных кнопок (от 3.3:1 на paper и surface). */
+  --ink: #141012;  /* Основной текст и заголовки на paper и surface. Заливка главной кнопки и выбранного варианта. */
+  --ink-muted: #615856;  /* Второстепенный текст и подписи рамки на paper и surface (от 5.9:1 в обеих темах). */
+  --on-ink: #faf7f5;  /* Текст на заливке ink. */
+  --red: #ff3b1f;  /* Фирменный красный «сигнал». Фоны постов и слайдов, акцентные цифры, слова и объекты. Текст на нём и им самим — от 24px (белый на red — 3.6:1). */
+  --red-deep: #d42408;  /* Красная заливка под мелким текстом в интерфейсе: красная кнопка, тег, буква выбранного ответа. С on-red — 5.2:1 в светлой и 5.7:1 в тёмной теме. */
+  --red-ink: #c8200a;  /* Красный текст мельче 24px на paper и surface: метки, ошибка в квизе. Кольцо фокуса. */
+  --on-red: #ffffff;  /* Текст на red-deep в любом размере; на red — от 24px. */
+  --pink: #ff6ad5;  /* Горячий розовый — только внутри 3D-объектов и градиента glow. Не для текста, кнопок и рамок. */
+  --wine: #b0102a;  /* Теневая сторона 3D-объектов, тёмный край градиента. Нигде больше. */
+  --ok: #17c27e;  /* Мятный зелёный: заливка верного ответа, большая галочка. Текст на нём — on-ok. */
+  --on-ok: #0a2e1c;  /* Текст и галочка на заливке ok (6.4:1). */
+  --ok-ink: #0a7a4a;  /* Зелёный текст «Верно» на paper и ok-soft. */
+  --ok-soft: #d7f5e7;  /* Светлая плашка под текстом ok-ink. */
+  --err-soft: #ffe3dd;  /* Фон неверного ответа; текст на нём — red-ink, рамка и крестик — red-deep. */
+  --focus: var(--red-ink);  /* Кольцо фокуса с клавиатуры: 3px с отступом 3px. Алиас red-ink. */
+  --shadow-object: 0 60px 90px -40px rgba(255, 59, 31, 0.5);  /* Цветная тень под 3D-объектом. Интерфейсу тени не нужны. */
+  --shadow-none: none;  /* Карточки, кнопки, варианты ответа: глубина — заливкой surface, не тенью. */
+}
+[data-theme="dark"] {
+  --paper: #131012;
+  --surface: #1e191b;
+  --surface-strong: #2b2427;
+  --line: #2f282a;
+  --line-strong: #75696b;
+  --ink: #f8f4f2;
+  --ink-muted: #b0a6a3;
+  --on-ink: #131012;
+  --red: #ff4a2e;
+  --red-deep: #ff4a2e;
+  --red-ink: #ff7a63;
+  --on-red: #131012;
+  --pink: #ff7adb;
+  --wine: #c2183a;
+  --ok: #2fd68f;
+  --on-ok: #0a2e1c;
+  --ok-ink: #4be3a0;
+  --ok-soft: #10301f;
+  --err-soft: #3a1610;
+  --focus: var(--red-ink);
+  --shadow-object: 0 60px 90px -40px rgba(255, 59, 31, 0.5);
+  --shadow-none: none;
+  color-scheme: dark;
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+  --space-30: 120px;
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 32px;
+  --radius-xl: 48px;
+  --radius-pill: 999px;
+  --glow: linear-gradient(135deg, #ff3b1f 0%, #ff6ad5 70%, #ffb3ea 100%);
+  --dur-enter: 0.9s;
+  --dur-pop: 0.7s;
+  --dur-float: 7s;
+  --dur-spin: 18s;
+  --stagger: 0.12s;
+  --font-display: Unbounded, "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  --font-body: Onest, "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+@property --ai-p { syntax: "<number>"; inherits: true; initial-value: 100; }
+
+:root {
+  /* искра ✦ — знак ИИ */
+  --ai-spark-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0C53 31 69 47 100 50C69 53 53 69 50 100C47 69 31 53 0 50C31 47 47 31 50 0Z'/%3E%3C/svg%3E");
+  /* галочка и крестик — толстые, читаются издалека */
+  --ai-check-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.8l4.8 4.8L19.6 6.8'/%3E%3C/svg%3E");
+  --ai-cross-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.6' stroke-linecap='round'%3E%3Cpath d='M6.5 6.5l11 11M17.5 6.5l-11 11'/%3E%3C/svg%3E");
+  --ai-arrow-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 5.5L19.5 12 13 18.5'/%3E%3C/svg%3E");
+}
+
+.ai-root {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 19px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Логотип ---------- */
+.ai-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.ai-wordmark__track { display: inline-flex; align-items: center; gap: 0.25em; font-weight: 600; color: var(--red-ink); }
+.ai-wordmark__track .ai-spark { --s: 0.8em; }
+.ai-wordmark--inherit, .ai-wordmark--inherit .ai-wordmark__track { color: inherit; }
+
+/* ---------- Иконки: галочка, крестик, стрелка ---------- */
+.ai-ico {
+  --s: 1em;
+  display: inline-block;
+  flex: none;
+  width: var(--s);
+  height: var(--s);
+  background: currentColor;
+  -webkit-mask: var(--ai-check-mask) center / contain no-repeat;
+  mask: var(--ai-check-mask) center / contain no-repeat;
+}
+.ai-ico--cross { -webkit-mask-image: var(--ai-cross-mask); mask-image: var(--ai-cross-mask); }
+.ai-ico--arrow { -webkit-mask-image: var(--ai-arrow-mask); mask-image: var(--ai-arrow-mask); }
+/* большой знак ответа в круге */
+.ai-mark {
+  --s: 96px;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: var(--ok);
+  color: var(--on-ok);
+}
+.ai-mark .ai-ico { --s: 62%; }
+.ai-mark--wrong { background: var(--red-deep); color: var(--on-red); }
+
+/* ---------- Кнопки ---------- */
+.ai-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 56px;
+  padding: 0 28px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid transparent;
+  font: 600 18px/1 var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+  white-space: nowrap;
+}
+.ai-btn:active { transform: scale(.97); }
+.ai-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.ai-btn--primary { background: var(--ink); color: var(--on-ink); }
+.ai-btn--primary:hover { background: var(--red-deep); color: var(--on-red); }
+.ai-btn--red { background: var(--red-deep); color: var(--on-red); }
+.ai-btn--red:hover { background: var(--ink); color: var(--on-ink); }
+.ai-btn--outline { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+.ai-btn--outline:hover { background: var(--surface); }
+.ai-btn--ghost { background: transparent; color: var(--ink); }
+.ai-btn--ghost:hover { background: var(--surface); }
+.ai-btn--s { height: 44px; padding: 0 20px; font-size: 16px; }
+.ai-btn--l { height: 64px; padding: 0 36px; font-size: 20px; }
+.ai-btn--block { display: flex; width: 100%; }
+.ai-btn .ai-ico { --s: 22px; }
+.ai-btn[disabled], .ai-btn.is-disabled { opacity: .4; pointer-events: none; }
+
+/* ---------- Теги ---------- */
+.ai-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 14px/1 var(--font-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ai-tag--dot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.ai-tag--red { background: var(--red-deep); color: var(--on-red); }
+.ai-tag--outline { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line-strong); }
+.ai-tag--ink { background: var(--ink); color: var(--on-ink); }
+
+/* ---------- Карточки ---------- */
+.ai-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.ai-card--ink { background: var(--ink); color: var(--on-ink); }
+.ai-card--red { background: var(--red-deep); color: var(--on-red); }
+.ai-card--line { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line); }
+/* номер — акцент: крупная красная цифра */
+.ai-card__num { font: 700 44px/.9 var(--font-display); letter-spacing: -0.04em; color: var(--red); }
+.ai-card--ink .ai-card__num { color: var(--red); }
+.ai-card--red .ai-card__num { color: var(--on-red); }
+.ai-card__meta { font: 500 14px/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-muted); }
+.ai-card--ink .ai-card__meta, .ai-card--red .ai-card__meta { color: inherit; opacity: .8; }
+.ai-card__title { font: 600 28px/1.1 var(--font-display); letter-spacing: -0.02em; margin: 0; }
+.ai-card__text { font-size: 19px; line-height: 1.4; margin: 0; }
+
+/* ---------- Поле ввода ---------- */
+.ai-field { display: flex; flex-direction: column; gap: 10px; }
+.ai-field__label { font: 500 14px/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-muted); }
+.ai-input {
+  height: 60px;
+  padding: 0 20px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--line-strong);
+  background: var(--paper);
+  color: var(--ink);
+  font: 500 19px/1 var(--font-body);
+  width: 100%;
+  box-sizing: border-box;
+}
+.ai-input::placeholder { color: var(--ink-muted); }
+.ai-input:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-color: var(--ink); }
+.ai-field__hint { font-size: 15px; color: var(--ink-muted); }
+
+/* ---------- 3D-объекты: искра, звезда, цветок, шар, кольцо ----------
+   Вектор: градиент, внутренняя тень и блик, без шума. Цвет: красный (по умолчанию), --pink, --ink.
+   Размер — --s. Пара объектов — .ai-pair (большой + маленький), размер пары — --ps. */
+.ai-obj { --s: 200px; width: var(--s); height: var(--s); flex: none; background: var(--obj) center / contain no-repeat; filter: drop-shadow(0 calc(var(--s) * .07) calc(var(--s) * .09) rgba(176, 16, 42, .22)); }
+.ai-obj--ink { filter: drop-shadow(0 calc(var(--s) * .07) calc(var(--s) * .09) rgba(20, 16, 18, .28)); }
+.ai-obj--spark { --obj: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E %3Cdefs%3E %3CradialGradient id='g' cx='38%25' cy='32%25' r='75%25'%3E %3Cstop offset='0' stop-color='%23ffc2e4'/%3E%3Cstop offset='.22' stop-color='%23ff6ad5'/%3E%3Cstop offset='.6' stop-color='%23ff3b1f'/%3E%3Cstop offset='1' stop-color='%23b0102a'/%3E %3C/radialGradient%3E %3Cfilter id='v' filterUnits='userSpaceOnUse' x='0' y='0' width='200' height='200' color-interpolation-filters='sRGB'%3E %3CfeGaussianBlur in='SourceAlpha' stdDeviation='5.4' result='b'/%3E %3CfeOffset in='b' dx='-5.4' dy='-6.6' result='o1'/%3E %3CfeComposite in='SourceAlpha' in2='o1' operator='arithmetic' k2='1' k3='-1' result='rim'/%3E %3CfeFlood flood-color='%236e0016' flood-opacity='.55'/%3E%3CfeComposite in2='rim' operator='in' result='dark'/%3E %3CfeOffset in='b' dx='3.6' dy='4.2' result='o2'/%3E %3CfeComposite in='SourceAlpha' in2='o2' operator='arithmetic' k2='1' k3='-1' result='rim2'/%3E %3CfeFlood flood-color='%23ffffff' flood-opacity='.45'/%3E%3CfeComposite in2='rim2' operator='in' result='light'/%3E %3CfeMerge%3E%3CfeMergeNode in='SourceGraphic'/%3E%3CfeMergeNode in='dark'/%3E%3CfeMergeNode in='light'/%3E%3C/feMerge%3E %3CfeComposite in2='SourceAlpha' operator='in'/%3E %3C/filter%3E %3Cfilter id='h' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='3.0'/%3E%3C/filter%3E %3Cmask id='c' maskUnits='userSpaceOnUse' x='0' y='0' width='200' height='200'%3E%3Cpath d='M100 26 C107 72 128 93 174 100 C128 107 107 128 100 174 C93 128 72 107 26 100 C72 93 93 72 100 26Z' fill='%23fff' stroke='%23fff' stroke-width='16' stroke-linejoin='round'/%3E%3C/mask%3E %3C/defs%3E %3Cg filter='url(%23v)'%3E%3Cpath d='M100 26 C107 72 128 93 174 100 C128 107 107 128 100 174 C93 128 72 107 26 100 C72 93 93 72 100 26Z' fill='url(%23g)' stroke='url(%23g)' stroke-width='16' stroke-linejoin='round'/%3E%3C/g%3E %3Cellipse cx='84' cy='80' rx='9' ry='26' transform='rotate(45 84 80)' fill='%23fff' opacity='.85' filter='url(%23h)' mask='url(%23c)'/%3E %3C/svg%3E"); }
+.ai-obj--spark.ai-obj--ink { --obj: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E %3Cdefs%3E %3CradialGradient id='g' cx='38%25' cy='32%25' r='75%25'%3E %3Cstop offset='0' stop-color='%238a7f86'/%3E%3Cstop offset='.22' stop-color='%233a3236'/%3E%3Cstop offset='.6' stop-color='%231d181b'/%3E%3Cstop offset='1' stop-color='%230b090a'/%3E %3C/radialGradient%3E %3Cfilter id='v' filterUnits='userSpaceOnUse' x='0' y='0' width='200' height='200' color-interpolation-filters='sRGB'%3E %3CfeGaussianBlur in='SourceAlpha' stdDeviation='5.4' result='b'/%3E %3CfeOffset in='b' dx='-5.4' dy='-6.6' result='o1'/%3E %3CfeComposite in='SourceAlpha' in2='o1' operator='arithmetic' k2='1' k3='-1' result='rim'/%3E %3CfeFlood flood-color='%23000000' flood-opacity='.55'/%3E%3CfeComposite in2='rim' operator='in' result='dark'/%3E %3CfeOffset in='b' dx='3.6' dy='4.2' result='o2'/%3E %3CfeComposite in='SourceAlpha' in2='o2' operator='arithmetic' k2='1' k3='-1' result='rim2'/%3E %3CfeFlood flood-color='%23ffffff' flood-opacity='.45'/%3E%3CfeComposite in2='rim2' operator='in' result='light'/%3E %3CfeMerge%3E%3CfeMergeNode in='SourceGraphic'/%3E%3CfeMergeNode in='dark'/%3E%3CfeMergeNode in='light'/%3E%3C/feMerge%3E %3CfeComposite in2='SourceAlpha' operator='in'/%3E %3C/filter%3E %3Cfilter id='h' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='3.0'/%3E%3C/filter%3E %3Cmask id='c' maskUnits='userSpaceOnUse' x='0' y='0' width='200' height='200'%3E%3Cpath d='M100 26 C107 72 128 93 174 100 C128 107 107 128 100 174 C93 128 72 107 26 100 C72 93 93 72 100 26Z' fill='%23fff' stroke='%23fff' stroke-width='16' stroke-linejoin='round'/%3E%3C/mask%3E %3C/defs%3E %3Cg filter='url(%23v)'%3E%3Cpath d='M100 26 C107 72 128 93 174 100 C128 107 107 128 100 174 C93 128 72 107 26 100 C72 93 93 72 100 26Z' fill='url(%23g)' stroke='url(%23g)' stroke-width='16' stroke-linejoin='round'/%3E%3C/g%3E %3Cellipse cx='84' cy='80' rx='9' ry='26' transform='rotate(45 84 80)' fill='%23fff' opacity='.85' filter='url(%23h)' mask='url(%23c)'/%3E %3C/svg%3E"); }
+.ai-obj--star { --obj: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E %3Cdefs%3E %3CradialGradient id='g' cx='38%25' cy='32%25' r='75%25'%3E %3Cstop offset='0' stop-color='%23ffc2e4'/%3E%3Cstop offset='.22' stop-color='%23ff6ad5'/%3E%3Cstop offset='.6' stop-color='%23ff3b1f'/%3E%3Cstop offset='1' stop-color='%23b0102a'/%3E %3C/radialGradient%3E %3Cfilter id='v' filterUnits='userSpaceOnUse' x='0' y='0' width='200' height='200' color-interpolation-filters='sRGB'%3E %3CfeGaussianBlur in='SourceAlpha' stdDeviation='9.0' result='b'/%3E %3CfeOffset in='b' dx='-9.0' dy='-11.0' result='o1'/%3E %3CfeComposite in='SourceAlpha' in2='o1' operator='arithmetic' k2='1' k3='-1' result='rim'/%3E %3CfeFlood flood-color='%236e0016' flood-opacity='.55'/%3E%3CfeComposite in2='rim' operator='in' result='dark'/%3E %3CfeOffset in='b' dx='6.0' dy='7.0' result='o2'/%3E %3CfeComposite in='SourceAlpha' in2='o2' operator='arithmetic' k2='1' k3='-1' result='rim2'/%3E %3CfeFlood flood-color='%23ffffff' flood-opacity='.45'/%3E%3CfeComposite in2='rim2' operator='in' result='light'/%3E %3CfeMerge%3E%3CfeMergeNode in='SourceGraphic'/%3E%3CfeMergeNode in='dark'/%3E%3CfeMergeNode in='light'/%3E%3C/feMerge%3E %3CfeComposite in2='SourceAlpha' operator='in'/%3E %3C/filter%3E %3Cfilter id='h' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='5.0'/%3E%3C/filter%3E %3Cmask id='c' maskUnits='userSpaceOnUse' x='0' y='0' width='200' height='200'%3E%3Cpath d='M100 30 L121.2 70.9 L166.6 78.4 L134.2 111.1 L141.1 156.6 L100 136 L58.9 156.6 L65.8 111.1 L33.4 78.4 L78.8 70.9Z' fill='%23fff' stroke='%23fff' stroke-width='26' stroke-linejoin='round'/%3E%3C/mask%3E %3C/defs%3E %3Cg filter='url(%23v)'%3E%3Cpath d='M100 30 L121.2 70.9 L166.6 78.4 L134.2 111.1 L141.1 156.6 L100 136 L58.9 156.6 L65.8 111.1 L33.4 78.4 L78.8 70.9Z' fill='url(%23g)' stroke='url(%23g)' stroke-width='26' stroke-linejoin='round'/%3E%3C/g%3E %3Cellipse cx='80' cy='76' rx='22' ry='13' transform='rotate(-30 80 76)' fill='%23fff' opacity='.85' filter='url(%23h)' mask='url(%23c)'/%3E %3C/svg%3E"); }
+.ai-obj--sphere { --obj: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E %3Cdefs%3E %3CradialGradient id='g' cx='38%25' cy='32%25' r='75%25'%3E %3Cstop offset='0' stop-color='%23ffc2e4'/%3E%3Cstop offset='.22' stop-color='%23ff6ad5'/%3E%3Cstop offset='.6' stop-color='%23ff3b1f'/%3E%3Cstop offset='1' stop-color='%23b0102a'/%3E %3C/radialGradient%3E %3Cfilter id='v' filterUnits='userSpaceOnUse' x='0' y='0' width='200' height='200' color-interpolation-filters='sRGB'%3E %3CfeGaussianBlur in='SourceAlpha' stdDeviation='9.0' result='b'/%3E %3CfeOffset in='b' dx='-9.0' dy='-11.0' result='o1'/%3E %3CfeComposite in='SourceAlpha' in2='o1' operator='arithmetic' k2='1' k3='-1' result='rim'/%3E %3CfeFlood flood-color='%236e0016' flood-opacity='.55'/%3E%3CfeComposite in2='rim' operator='in' result='dark'/%3E %3CfeOffset in='b' dx='6.0' dy='7.0' result='o2'/%3E %3CfeComposite in='SourceAlpha' in2='o2' operator='arithmetic' k2='1' k3='-1' result='rim2'/%3E %3CfeFlood flood-color='%23ffffff' flood-opacity='.45'/%3E%3CfeComposite in2='rim2' operator='in' result='light'/%3E %3CfeMerge%3E%3CfeMergeNode in='SourceGraphic'/%3E%3CfeMergeNode in='dark'/%3E%3CfeMergeNode in='light'/%3E%3C/feMerge%3E %3CfeComposite in2='SourceAlpha' operator='in'/%3E %3C/filter%3E %3Cfilter id='h' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='5.0'/%3E%3C/filter%3E %3Cmask id='c' maskUnits='userSpaceOnUse' x='0' y='0' width='200' height='200'%3E%3Cpath d='M100 28a72 72 0 1 0 0.01 0Z' fill='%23fff'/%3E%3C/mask%3E %3C/defs%3E %3Cg filter='url(%23v)'%3E%3Cpath d='M100 28a72 72 0 1 0 0.01 0Z' fill='url(%23g)'/%3E%3C/g%3E %3Cellipse cx='74' cy='68' rx='24' ry='15' transform='rotate(-40 74 68)' fill='%23fff' opacity='.85' filter='url(%23h)' mask='url(%23c)'/%3E %3C/svg%3E"); }
+.ai-obj--sphere.ai-obj--pink { --obj: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E %3Cdefs%3E %3CradialGradient id='g' cx='38%25' cy='32%25' r='75%25'%3E %3Cstop offset='0' stop-color='%23fff0fa'/%3E%3Cstop offset='.22' stop-color='%23ffb0e6'/%3E%3Cstop offset='.6' stop-color='%23ff6ad5'/%3E%3Cstop offset='1' stop-color='%23d0247a'/%3E %3C/radialGradient%3E %3Cfilter id='v' filterUnits='userSpaceOnUse' x='0' y='0' width='200' height='200' color-interpolation-filters='sRGB'%3E %3CfeGaussianBlur in='SourceAlpha' stdDeviation='9.0' result='b'/%3E %3CfeOffset in='b' dx='-9.0' dy='-11.0' result='o1'/%3E %3CfeComposite in='SourceAlpha' in2='o1' operator='arithmetic' k2='1' k3='-1' result='rim'/%3E %3CfeFlood flood-color='%23a0135c' flood-opacity='.55'/%3E%3CfeComposite in2='rim' operator='in' result='dark'/%3E %3CfeOffset in='b' dx='6.0' dy='7.0' result='o2'/%3E %3CfeComposite in='SourceAlpha' in2='o2' operator='arithmetic' k2='1' k3='-1' result='rim2'/%3E %3CfeFlood flood-color='%23ffffff' flood-opacity='.45'/%3E%3CfeComposite in2='rim2' operator='in' result='light'/%3E %3CfeMerge%3E%3CfeMergeNode in='SourceGraphic'/%3E%3CfeMergeNode in='dark'/%3E%3CfeMergeNode in='light'/%3E%3C/feMerge%3E %3CfeComposite in2='SourceAlpha' operator='in'/%3E %3C/filter%3E %3Cfilter id='h' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='5.0'/%3E%3C/filter%3E %3Cmask id='c' maskUnits='userSpaceOnUse' x='0' y='0' width='200' height='200'%3E%3Cpath d='M100 28a72 72 0 1 0 0.01 0Z' fill='%23fff'/%3E%3C/mask%3E %3C/defs%3E %3Cg filter='url(%23v)'%3E%3Cpath d='M100 28a72 72 0 1 0 0.01 0Z' fill='url(%23g)'/%3E%3C/g%3E %3Cellipse cx='74' cy='68' rx='24' ry='15' transform='rotate(-40 74 68)' fill='%23fff' opacity='.85' filter='url(%23h)' mask='url(%23c)'/%3E %3C/svg%3E"); }
+.ai-obj--sphere.ai-obj--ink { --obj: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E %3Cdefs%3E %3CradialGradient id='g' cx='38%25' cy='32%25' r='75%25'%3E %3Cstop offset='0' stop-color='%238a7f86'/%3E%3Cstop offset='.22' stop-color='%233a3236'/%3E%3Cstop offset='.6' stop-color='%231d181b'/%3E%3Cstop offset='1' stop-color='%230b090a'/%3E %3C/radialGradient%3E %3Cfilter id='v' filterUnits='userSpaceOnUse' x='0' y='0' width='200' height='200' color-interpolation-filters='sRGB'%3E %3CfeGaussianBlur in='SourceAlpha' stdDeviation='9.0' result='b'/%3E %3CfeOffset in='b' dx='-9.0' dy='-11.0' result='o1'/%3E %3CfeComposite in='SourceAlpha' in2='o1' operator='arithmetic' k2='1' k3='-1' result='rim'/%3E %3CfeFlood flood-color='%23000000' flood-opacity='.55'/%3E%3CfeComposite in2='rim' operator='in' result='dark'/%3E %3CfeOffset in='b' dx='6.0' dy='7.0' result='o2'/%3E %3CfeComposite in='SourceAlpha' in2='o2' operator='arithmetic' k2='1' k3='-1' result='rim2'/%3E %3CfeFlood flood-color='%23ffffff' flood-opacity='.45'/%3E%3CfeComposite in2='rim2' operator='in' result='light'/%3E %3CfeMerge%3E%3CfeMergeNode in='SourceGraphic'/%3E%3CfeMergeNode in='dark'/%3E%3CfeMergeNode in='light'/%3E%3C/feMerge%3E %3CfeComposite in2='SourceAlpha' operator='in'/%3E %3C/filter%3E %3Cfilter id='h' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='5.0'/%3E%3C/filter%3E %3Cmask id='c' maskUnits='userSpaceOnUse' x='0' y='0' width='200' height='200'%3E%3Cpath d='M100 28a72 72 0 1 0 0.01 0Z' fill='%23fff'/%3E%3C/mask%3E %3C/defs%3E %3Cg filter='url(%23v)'%3E%3Cpath d='M100 28a72 72 0 1 0 0.01 0Z' fill='url(%23g)'/%3E%3C/g%3E %3Cellipse cx='74' cy='68' rx='24' ry='15' transform='rotate(-40 74 68)' fill='%23fff' opacity='.85' filter='url(%23h)' mask='url(%23c)'/%3E %3C/svg%3E"); }
+.ai-pair { --ps: 400px; position: relative; width: var(--ps); height: var(--ps); flex: none; }
+.ai-pair > .ai-obj { position: absolute; }
+.ai-pair > .ai-obj:first-child { --s: calc(var(--ps) * .74); left: 0; bottom: 0; }
+.ai-pair > .ai-obj:last-child { --s: calc(var(--ps) * .42); right: 0; top: 0; }
+.ai-pair--diag > .ai-obj:first-child { top: 0; bottom: auto; }
+.ai-pair--diag > .ai-obj:last-child { top: auto; bottom: 0; }
+
+
+/* плоская искра ✦ — знак ИИ в логотипе и рамке */
+.ai-spark { --s: 48px; display: inline-block; flex: none; width: var(--s); height: var(--s); background: var(--glow); -webkit-mask: var(--ai-spark-mask) center / contain no-repeat; mask: var(--ai-spark-mask) center / contain no-repeat; }
+.ai-spark--ink { background: var(--ink); }
+.ai-spark--red { background: var(--red); }
+.ai-spark--paper { background: var(--paper); }
+.ai-spark--white { background: #ffffff; }
+/* ---------- Квиз на телефоне ---------- */
+.ai-phone {
+  width: 380px;
+  height: 800px;
+  box-sizing: border-box;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  border-radius: 40px;
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+.ai-quizbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.ai-timer {
+  --p: 60;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 500 15px/1 var(--font-mono);
+  background:
+    radial-gradient(closest-side, var(--paper) 76%, transparent 78%),
+    conic-gradient(var(--red) calc(var(--p) * 1%), var(--surface-strong) 0);
+}
+.ai-qimage { height: 160px; border-radius: var(--radius-md); background: var(--surface-strong); position: relative; overflow: hidden; flex: none; }
+.ai-question { font: 500 24px/1.25 var(--font-body); margin: 0; text-wrap: balance; }
+.ai-options { display: flex; flex-direction: column; gap: 10px; }
+.ai-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 8px 16px 8px 8px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 18px/1.25 var(--font-body);
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color .15s ease, transform .15s ease;
+}
+.ai-option:hover { background: var(--surface-strong); }
+.ai-option:active { transform: scale(.98); }
+.ai-option:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.ai-option__key {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+  font: 700 22px/1 var(--font-display);
+}
+.ai-option__key .ai-ico { --s: 30px; }
+.ai-option__mark { margin-left: auto; font: 600 15px/1 var(--font-body); white-space: nowrap; }
+.ai-option.is-selected { background: var(--ink); color: var(--on-ink); }
+.ai-option.is-selected .ai-option__key { background: var(--red-deep); color: var(--on-red); }
+.ai-option.is-correct { background: var(--ok); color: var(--on-ok); }
+.ai-option.is-correct .ai-option__key { background: var(--on-ok); color: var(--ok); }
+.ai-option.is-wrong { background: var(--err-soft); color: var(--red-ink); border-color: var(--red-deep); }
+.ai-option.is-wrong .ai-option__key { background: var(--red-deep); color: var(--on-red); }
+.ai-option.is-dim { opacity: .4; }
+.ai-option[disabled] { cursor: default; }
+.ai-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  font: 500 17px/1.3 var(--font-body);
+  background: var(--surface);
+  color: var(--ink-muted);
+}
+.ai-status--ok { background: var(--ok-soft); color: var(--ok-ink); }
+
+/* ================================================================
+   АНИМАЦИИ. Работают внутри контейнера с классом .ai-play;
+   без него макет статичный и полностью виден (для печати и PNG).
+   Задержка: --i (порядковый номер элемента) или --d (секунды).
+   ================================================================ */
+@keyframes ai-rise { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: none; } }
+@keyframes ai-pop { 0% { opacity: 0; transform: scale(.4) rotate(var(--r, 0deg)); } 70% { opacity: 1; transform: scale(1.06) rotate(var(--r, 0deg)); } 100% { opacity: 1; transform: scale(1) rotate(var(--r, 0deg)); } }
+@keyframes ai-float { from { transform: translateY(-18px) rotate(-2deg); } to { transform: translateY(18px) rotate(2deg); } }
+@keyframes ai-flash { 0% { opacity: 0; transform: scale(.6); } 60% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: scale(1); } }
+
+.ai-play .ai-rise { animation: ai-rise var(--dur-enter, .9s) cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--d, 0s) + var(--i, 0) * var(--stagger, .12s)); }
+.ai-play .ai-pop { animation: ai-pop var(--dur-pop, .7s) cubic-bezier(.3,1.4,.5,1) both; animation-delay: calc(var(--d, 0s) + var(--i, 0) * var(--stagger, .12s)); }
+.ai-play .ai-flash { animation: ai-flash .6s cubic-bezier(.3,1.4,.5,1) both; animation-delay: var(--d, 0s); }
+.ai-play .ai-float { animation: ai-float var(--dur-float, 7s) ease-in-out infinite alternate; animation-delay: var(--fd, 0s); }
+/* объект и появляется, и покачивается: обёртка .ai-rot.ai-pop задаёт место и поворот --r, внутри объект с .ai-float */
+.ai-rot { transform: rotate(var(--r, 0deg)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-play *, .ai-play *::before, .ai-play *::after { animation: none !important; }
+  .ai-btn, .ai-option { transition: none; }
+}
+

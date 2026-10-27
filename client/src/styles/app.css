@@ -1,0 +1,64 @@
+/* Экраны участника. Только токены дизайн-системы, новых цветов нет. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { min-height: 100vh; min-height: 100dvh; }
+button { font-family: inherit; }
+
+/* Высота — min-height, не height: если текст ровно в экран, прокрутка не ломается.
+   Снизу запас под панель мобильного Яндекс.Браузера и безопасную зону. */
+.screen {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: max(16px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.stack { display: flex; flex-direction: column; gap: 14px; }
+
+.hero { display: grid; place-items: center; padding: 8px 0; }
+.title { font: 600 34px/1.02 var(--font-display); letter-spacing: -0.03em; margin: 0; text-wrap: balance; }
+.sub { margin: 10px 0 0; color: var(--ink-muted); font-size: 19px; line-height: 1.4; }
+.nick { display: inline-flex; align-items: center; gap: 8px; font: 500 15px/1 var(--font-mono); color: var(--ink-muted); min-width: 0; overflow-wrap: anywhere; }
+.count { font: 500 14px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
+.form-error { margin: 0; color: var(--red-ink); font-size: 16px; line-height: 1.35; }
+.code-input { font-family: var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+
+.code-card {
+  background: var(--ink);
+  color: var(--on-ink);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.code-card__label { color: inherit; opacity: .75; }
+.code-card__code { font: 700 52px/1 var(--font-display); letter-spacing: .1em; color: var(--red); }
+.code-uses { margin: 0; padding-left: 22px; font-size: 18px; line-height: 1.5; }
+
+.countdown { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18vh 0 0; }
+.countdown__num { font: 700 180px/.9 var(--font-display); letter-spacing: -0.04em; color: var(--red); animation: ai-flash .6s cubic-bezier(.3,1.4,.5,1) both; }
+
+.question-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 34px; }
+.ai-qimage img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.ai-option__text { min-width: 0; overflow-wrap: anywhere; }
+
+/* Низкие экраны (iPhone SE и похожие): пять вариантов с картинкой — почти без прокрутки. */
+@media (max-height: 720px) {
+  .screen { gap: 10px; }
+  .ai-qimage { height: 112px; }
+  .ai-question { font-size: 21px; }
+  .ai-options { gap: 8px; }
+  .ai-option { min-height: 54px; padding: 5px 12px 5px 5px; }
+  .ai-option__key { width: 42px; height: 42px; font-size: 19px; }
+  .ai-timer { width: 48px; height: 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdown__num { animation: none; }
+}
