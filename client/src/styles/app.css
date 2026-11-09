@@ -22,7 +22,14 @@ button { font-family: inherit; }
 .q-h--xl { font-size: 40px; }
 .q-h--question { font-size: 22px; }
 .q-t--strong { font-weight: 800; }
-.q-opt__text { min-width: 0; overflow-wrap: anywhere; }
+/* Буква варианта — по верху текста: при переносе на две строки буквы стоят ровным столбиком.
+   Отступ 7px ставит первую строку (18px × 1.2) по центру плашки с буквой 36px. */
+.q-opt { align-items: flex-start; }
+.q-opt__text { min-width: 0; overflow-wrap: anywhere; padding-top: 7px; }
+.q-opt__note { align-self: center; }
+
+/* На экранах входа логоблок крупнее; на экранах игры — 30px, как в макете */
+.q-top--entry .lockup { --h: 40px; }
 .q-opt:focus-visible, .q-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 .on-red .q-btn:focus-visible { outline-color: var(--white); }
 .q-input::placeholder { color: var(--muted); font-weight: 500; }
@@ -32,7 +39,9 @@ button { font-family: inherit; }
 
 .code-sticker { font-size: 24px; align-self: flex-start; }
 /* «Спасибо!» в макете — 84px; на экранах уже 400px слово не влезает, поэтому не больше 21vw */
-.thanks { font-size: min(84px, 21vw); line-height: 1; }
+/* Наклон warp сужает слово только на экране, а место в вёрстке оно занимает прежнее (~420px):
+   без overflow страница на телефоне сдвигалась вбок. Видимая часть слова в блок помещается. */
+.thanks { font-size: min(84px, 21vw); line-height: 1; overflow: hidden; }
 .offline { display: grid; gap: 8px; }
 .offline .q-tag { justify-self: start; }
 .offline .q-h { font-size: 20px; }

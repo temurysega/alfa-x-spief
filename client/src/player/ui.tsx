@@ -41,9 +41,15 @@ export function Screen({ tone = 'paper', children }: { tone?: Tone; children: Re
 }
 
 // Верх экрана: логоблок и метка справа (ник или номер вопроса).
-export function Top({ white = false, tag, tagClass = '' }: { white?: boolean; tag?: string; tagClass?: string }) {
+// На экранах входа логоблок крупнее (entry), на экранах игры — как в макете.
+export function Top({ white = false, entry = false, tag, tagClass = '' }: {
+  white?: boolean;
+  entry?: boolean;
+  tag?: string;
+  tagClass?: string;
+}) {
   return (
-    <div className="q-top">
+    <div className={`q-top${entry ? ' q-top--entry' : ''}`}>
       <Lockup white={white} />
       {tag && <span className={`q-tag ${tagClass}`.trim()}>{tag}</span>}
     </div>

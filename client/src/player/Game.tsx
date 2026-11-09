@@ -188,7 +188,6 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
           <Spark size={96} />
           <h1 className="q-h q-h--xl">Ты в игре!</h1>
           <p className="q-t">Ждём начала. Первый вопрос появится здесь сам, страницу обновлять не нужно</p>
-          <p className="q-s">Квиз / игра {snap.game} из 2</p>
         </div>
       </Screen>
     );
@@ -206,8 +205,14 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
           </div>
           {snap.game === 1 ? (
             <>
-              <p className="q-t">Первая часть квиза позади. Итоги — в конце практики, чт 12.11 / 17:00</p>
-              <p className="q-s">Во вторую игру заходи с этого же телефона, а с другого устройства — по секретному коду</p>
+              <p className="q-t">
+                Поздравляем, первая часть квиза позади! Ждём тебя на практике 12 ноября в 17:00 — там будет вторая часть
+                и награждение победителей.
+              </p>
+              <p className="q-s">
+                Чтобы войти во вторую часть, понадобятся ник и секретный код: ник — в правом верхнем углу экрана, код — на
+                твоём скриншоте. До встречи!
+              </p>
             </>
           ) : (
             <p className="q-t">Итоги — на экране у ведущего</p>
@@ -257,15 +262,15 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
 
   let status: { text: string; error?: boolean } | null = null;
   if (revealed) {
-    if (myAnswer === null) status = { text: 'Ответа не было. Следующий вопрос — на экране эфира' };
-    else if (myAnswer === snap.correct) status = { text: 'Твой ответ верный. Следующий вопрос — на экране эфира' };
-    else status = { text: 'Следующий вопрос — на экране эфира' };
+    if (myAnswer === null) status = { text: 'Ответ не получен. Следующий вопрос появится здесь' };
+    else if (myAnswer === snap.correct) status = { text: 'Верно! Следующий вопрос появится здесь' };
+    else status = { text: 'Следующий вопрос появится здесь' };
   } else if (pending?.questionId === snap.questionId && pending.status === 'rejected' && snap.myAnswer === null) {
     status = { text: 'Ответ не принят — время вышло', error: true };
   } else if (pending?.questionId === snap.questionId && pending.status === 'failed' && snap.myAnswer === null) {
     status = { text: 'Ответ не отправился. Проверь интернет и нажми ещё раз', error: true };
   } else if (myAnswer !== null) {
-    status = { text: snap.myAnswer === null && pending?.status === 'sending' ? 'Отправляем ответ…' : 'Ответ принят. Правильный покажем после таймера' };
+    status = { text: snap.myAnswer === null && pending?.status === 'sending' ? 'Отправляем ответ…' : 'Ответ принят! Правильный покажем, когда закончится время' };
   } else if (!canAnswer) {
     status = { text: 'Время вышло' };
   }

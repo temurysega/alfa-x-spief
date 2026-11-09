@@ -37,16 +37,17 @@ export function Join({ notice, onJoined, onLogin }: {
 
   return (
     <Screen>
-      <Top />
+      <Top entry />
       <form className="q-center" onSubmit={submit}>
         {notice && (
           <div className="q-card">
             <p className="q-t">{notice}</p>
           </div>
         )}
-        <span className="q-tag">Точка будущего / квиз</span>
+        <span className="q-tag">Точка будущего / Квиз</span>
         <h1 className="q-h">Придумай ник для игры</h1>
-        <p className="q-s">Только ник, без имени и фамилии. Вопросы покажут в эфире, отвечать — здесь</p>
+        {/* Пересказывает проверки сервера (server/src/nick.ts), сами правила не меняются */}
+        <p className="q-s">От 2 до 20 символов: русские или английские буквы, цифры, пробел, точка, _ или -</p>
         <input
           className={`q-input${error ? ' is-error' : ''}`}
           value={nick}
@@ -94,9 +95,9 @@ export function Login({ onDone, onBack }: { onDone: (token: string) => void; onB
 
   return (
     <Screen>
-      <Top />
+      <Top entry />
       <form className="q-center" onSubmit={submit}>
-        <span className="q-tag">Точка будущего / квиз</span>
+        <span className="q-tag">Точка будущего / Квиз</span>
         <h1 className="q-h">Вход по коду</h1>
         <p className="q-s">Код был на экране после первого входа — поищи его в скриншотах</p>
         <input className={`q-input${error ? ' is-error' : ''}`} value={nick} onChange={(e) => setNick(e.target.value)}
@@ -126,8 +127,10 @@ export function CodeReveal({ nick, code, onNext }: { nick: string; code: string;
         <h1 className="q-h">Твой секретный код</h1>
         <p className="q-code">{code}</p>
         <p className="q-t">
-          По коду войдёшь с другого устройства и во вторую игру 12.11, а если победишь — подтвердишь, что это ты.
-          Больше мы его не покажем
+          Мы показываем код только один раз — сохрани его.
+          <br />
+          По нику и коду ты сможешь войти с другого устройства или браузера. Код понадобится во второй части квиза
+          12 ноября, а если победишь — с ним ты подтвердишь победу.
         </p>
         <p className="q-s">Никому не показывай код: по нему можно войти под твоим ником</p>
         <button className="q-btn" type="button" onClick={onNext}>
