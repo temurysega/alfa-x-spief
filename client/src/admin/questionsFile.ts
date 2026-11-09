@@ -1,7 +1,9 @@
 // Файлы вопросов: JSON или CSV (ТЗ, п. 5). В файле правильный вариант — номер с 1
-// (или буква А–Д), внутри программы — индекс с нуля. Переводится только здесь.
+// (или буква A–E, можно и русскими А–Д), внутри программы — индекс с нуля. Переводится только здесь.
 
 import { LETTERS, type Question } from './types';
+
+const CYRILLIC_LETTERS = ['А', 'Б', 'В', 'Г', 'Д'];
 
 export type FileQuestion = {
   text: string;
@@ -14,9 +16,9 @@ export type FileQuestion = {
 
 function parseCorrect(raw: unknown, count: number, n: number): number {
   const s = String(raw ?? '').trim().toUpperCase();
-  const letter = LETTERS.indexOf(s);
-  const latin = ['A', 'B', 'C', 'D', 'E'].indexOf(s);
-  const index = letter >= 0 ? letter : latin >= 0 ? latin : Number(s) - 1;
+  const latin = LETTERS.indexOf(s);
+  const cyrillic = CYRILLIC_LETTERS.indexOf(s);
+  const index = latin >= 0 ? latin : cyrillic >= 0 ? cyrillic : Number(s) - 1;
   if (!Number.isInteger(index) || index < 0 || index >= count) {
     throw new Error(`Вопрос ${n}: правильный вариант — номер от 1 до ${count} или буква`);
   }

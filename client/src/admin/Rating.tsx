@@ -24,33 +24,36 @@ export function Rating({ api }: TabProps) {
   const download = (path: string, name: string) => api.download(path, name).catch((e) => setError(errorText(e)));
 
   return (
-    <section className="adm-stack">
-      <div className="adm-row">
-        <button className="ai-btn ai-btn--primary ai-btn--s" type="button" onClick={() => download('/export/rating.csv', 'rating.csv')}>
-          Скачать рейтинг CSV
-        </button>
-        <button className="ai-btn ai-btn--outline ai-btn--s" type="button" onClick={() => download('/export/answers.csv', 'answers.csv')}>
-          Скачать все ответы CSV
-        </button>
-        <button className="ai-btn ai-btn--ghost ai-btn--s" type="button" onClick={load}>Обновить</button>
+    <section className="adm-card">
+      <div className="adm-split">
+        <span className="adm-h">Рейтинг</span>
+        <div className="adm-row">
+          <button className="adm-btn adm-btn--sm" type="button" onClick={() => download('/export/rating.csv', 'rating.csv')}>
+            Выгрузить CSV
+          </button>
+          <button className="adm-btn adm-btn--ghost adm-btn--sm" type="button" onClick={() => download('/export/answers.csv', 'answers.csv')}>
+            Все ответы CSV
+          </button>
+          <button className="adm-btn adm-btn--ghost adm-btn--sm" type="button" onClick={load}>Обновить</button>
+        </div>
       </div>
-      <p className="adm-muted">
+      <p className="q-s">
         Общий рейтинг двух игр по закрытым вопросам. Верный ответ — 1 балл, на вопросе с двойными баллами — 2. При
-        равных баллах выше тот, у кого меньше суммарное время на верные ответы.
+        равных баллах выше тот, у кого меньше суммарное время на верные ответы
       </p>
-      {error && <p className="form-error">{error}</p>}
+      {error && <p className="q-err">{error}</p>}
       <table className="adm-table">
         <thead>
           <tr><th>Место</th><th>Ник</th><th>Баллы</th><th>Верных</th><th>Время, с</th></tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.playerId}>
-              <td className="adm-place">{r.place}</td>
+            <tr key={r.playerId} className={r.place <= 3 && r.points > 0 ? 'is-top' : ''}>
+              <td>{r.place}</td>
               <td className="adm-nick">{r.nick}</td>
-              <td><b>{r.points}</b></td>
+              <td>{r.points}</td>
               <td>{r.correctCount}</td>
-              <td>{(r.timeMs / 1000).toFixed(2)}</td>
+              <td>{(r.timeMs / 1000).toFixed(1).replace('.', ',')}</td>
             </tr>
           ))}
         </tbody>

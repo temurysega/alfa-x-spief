@@ -34,16 +34,22 @@ export function Players({ api }: TabProps) {
   const shown = rows.filter((r) => r.nick.toLowerCase().includes(filter.trim().toLowerCase()));
 
   return (
-    <section className="adm-stack">
-      <div className="adm-row">
-        <span className="ai-tag ai-tag--ink">Участников: {rows.length}</span>
-        <input className="ai-input adm-search" placeholder="Поиск по нику" value={filter} onChange={(e) => setFilter(e.target.value)} />
-        <button className="ai-btn ai-btn--ghost ai-btn--s" type="button" onClick={load}>Обновить</button>
+    <section className="adm-card">
+      <div className="adm-split">
+        <div className="adm-row">
+          <span className="adm-h">Участники</span>
+          <span className="q-tag">{rows.length}</span>
+        </div>
+        <div className="adm-row">
+          <input className="q-input adm-input" style={{ width: 240 }} placeholder="Поиск по нику" aria-label="Поиск по нику"
+            value={filter} onChange={(e) => setFilter(e.target.value)} />
+          <button className="adm-btn adm-btn--ghost adm-btn--sm" type="button" onClick={load}>Обновить</button>
+        </div>
       </div>
-      {error && <p className="form-error">{error}</p>}
+      {error && <p className="q-err">{error}</p>}
       <table className="adm-table">
         <thead>
-          <tr><th>Ник</th><th>Вошёл</th><th>Ответов</th><th /></tr>
+          <tr><th>Ник</th><th>Вошёл (МСК)</th><th>Ответов</th><th /></tr>
         </thead>
         <tbody>
           {shown.map((r) => (
@@ -51,20 +57,20 @@ export function Players({ api }: TabProps) {
               <td className="adm-nick">{r.nick}</td>
               <td>{new Date(r.createdAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}</td>
               <td>{r.answers}</td>
-              <td className="adm-table__actions">
-                <button className="ai-btn ai-btn--outline ai-btn--s" type="button"
+              <td className="adm-actions">
+                <button className="adm-link" type="button"
                   onClick={() => {
                     const nick = window.prompt('Новый ник', r.nick);
                     if (nick && nick !== r.nick) void act(() => api.post('/players/rename', { id: r.id, nick }));
                   }}>
-                  Переименовать
+                  переименовать
                 </button>
-                <button className="ai-btn ai-btn--ghost ai-btn--s" type="button"
+                <button className="adm-link" type="button"
                   onClick={() =>
                     window.confirm(`Удалить «${r.nick}» вместе с ответами? Участник окажется на экране входа.`) &&
                     act(() => api.post('/players/delete', { id: r.id }))
                   }>
-                  Удалить
+                  удалить
                 </button>
               </td>
             </tr>

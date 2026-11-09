@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ApiError, request } from '../api';
 import { serverNow, syncClock } from '../clock';
 import { LETTERS, type Pending, type Snapshot } from './types';
-import { Nick, Pair, Screen } from './ui';
+import { Screen, Spark, Top } from './ui';
 
 const POLL_MS = 2500;
 const GRACE_MS = 1000;
@@ -145,55 +145,74 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
   );
 
   if (!snap) {
+    // К10 — нет связи, пока не пришёл ни один снимок.
     return (
       <Screen>
-        <p className="sub">{online ? 'Подключаемся к игре…' : 'Нет связи — переподключаемся…'}</p>
+        <Top />
+        <div className="q-center">
+          {online ? (
+            <p className="q-t">Подключаемся к игре…</p>
+          ) : (
+            <>
+              <div className="q-card offline">
+                <span className="q-tag">Нет связи</span>
+                <p className="q-h">Переподключаемся…</p>
+                <p className="q-s">Ответы и ник сохранены. Не закрывай страницу</p>
+              </div>
+              <button className="q-btn q-btn--ghost" type="button" onClick={() => window.location.reload()}>
+                Обновить страницу
+              </button>
+            </>
+          )}
+        </div>
       </Screen>
     );
   }
 
-  const offline = !online && <div className="ai-status">Нет связи — переподключаемся…</div>;
+  // К10 — плашка поверх любого экрана, пока клиент переподключается.
+  const offline = !online && (
+    <div className="q-card offline">
+      <span className="q-tag">Нет связи</span>
+      <p className="q-h">Переподключаемся…</p>
+      <p className="q-s">Ответы и ник сохранены. Не закрывай страницу</p>
+    </div>
+  );
 
+  // К04 — лобби.
   if (snap.phase === 'lobby') {
     return (
-      <Screen>
-        <div className="ai-quizbar">
-          <Nick nick={snap.nick} />
-          <span className="count">Игра {snap.game}</span>
-        </div>
+      <Screen tone="red">
+        <Top white tag={snap.nick} tagClass="q-tag--white" />
         {offline}
-        <div className="hero">
-          <Pair big={['spark', 'red']} small={['sphere', 'ink']} />
+        <div className="q-center">
+          <Spark size={96} />
+          <h1 className="q-h q-h--xl">Ты в игре!</h1>
+          <p className="q-t">Ждём начала. Первый вопрос появится здесь сам, страницу обновлять не нужно</p>
+          <p className="q-s">Квиз / игра {snap.game} из 2</p>
         </div>
-        <div>
-          <h1 className="title">Ты в игре</h1>
-          <p className="sub">Ждём начала. Вопросы ведущий покажет в эфире, а отвечать — здесь.</p>
-        </div>
-        <div className="ai-status">Не закрывай эту страницу</div>
       </Screen>
     );
   }
 
+  // К09 — игра окончена.
   if (snap.phase === 'finished') {
     return (
-      <Screen>
-        <div className="ai-quizbar">
-          <Nick nick={snap.nick} />
-          <span className="count">Игра {snap.game}</span>
-        </div>
+      <Screen tone="red">
+        <Top white tag={snap.nick} tagClass="q-tag--white" />
         {offline}
-        <div className="hero">
-          <Pair big={['star', 'red']} small={['spark', 'ink']} />
-        </div>
-        <div>
-          <h1 className="title">Спасибо!</h1>
-          <p className="sub">Итоги — в конце практики 12.11, на экране эфира.</p>
-        </div>
-        {snap.game === 1 && (
-          <div className="ai-status">
-            Вторая часть квиза — чт 12.11 · 17:00 МСК. Заходи под этим же ником, с другого устройства — по коду.
+        <div className="q-center">
+          <div className="thanks">
+            <span className="warp" style={{ '--wa': '30deg' } as CSSProperties}>Спасибо!</span>
           </div>
-        )}
+          {snap.game === 1 ? (
+            <>
+              <p className="q-t">Первая часть квиза позади. Итоги — в конце практики, чт 12.11 / 17:00</p>
+              <p className="q-s">Во вторую игру заходи с этого же телефона, а с другого устройства — по секретному коду</p>
+            </>
+          ) : (
+            <p className="q-t">Итоги — на экране у ведущего</p>
+          )}
+        </div>
       </Screen>
     );
   }
@@ -205,26 +224,27 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
   if (phase === 'countdown' && t >= opensAt) phase = 'question';
   if (phase === 'question' && t < opensAt) phase = 'countdown';
 
-  const counter = `Вопрос ${snap.questionNo} / ${snap.questionsTotal}`;
+  const counter = `${snap.questionNo} / ${snap.questionsTotal}`;
 
+  // К05 — отсчёт 5 секунд.
   if (phase === 'countdown') {
     const left = Math.max(1, Math.ceil((opensAt - t) / 1000));
     return (
-      <Screen>
-        <div className="ai-quizbar">
-          <Nick nick={snap.nick} />
-          <span className="count">{counter}</span>
-        </div>
+      <Screen tone="red">
+        <Top white tag={snap.nick} tagClass="q-tag--white" />
         {offline}
-        <div className="countdown">
-          <span className="count">Вопрос через</span>
-          <span className="countdown__num" key={left}>{left}</span>
-          {snap.double && <span className="ai-tag ai-tag--red">Двойные баллы</span>}
+        <div className="q-center q-center--middle">
+          <p className="q-t q-t--strong">
+            Вопрос {snap.questionNo} из {snap.questionsTotal} через
+          </p>
+          <p className="q-count">{left}</p>
+          {snap.double && <span className="q-tag q-tag--lime">Двойные баллы</span>}
         </div>
       </Screen>
     );
   }
 
+  // К06–К08 — вопрос, ответ принят, ответ показан.
   const revealed = phase === 'revealed';
   const local = pending && pending.questionId === snap.questionId && pending.status !== 'rejected' && pending.status !== 'failed'
     ? pending.option
@@ -233,18 +253,17 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
   const timeLeft = Math.max(0, deadline - t);
   const canAnswer = !revealed && myAnswer === null && t >= opensAt && t <= deadline + GRACE_MS;
   const total = Math.max(1, deadline - opensAt);
-  const percent = revealed ? 0 : Math.round((timeLeft / total) * 100);
   const secs = Math.ceil(timeLeft / 1000);
 
-  let status: { text: string; ok?: boolean } | null = null;
+  let status: { text: string; error?: boolean } | null = null;
   if (revealed) {
     if (myAnswer === null) status = { text: 'Ответа не было. Следующий вопрос — на экране эфира' };
-    else if (myAnswer === snap.correct) status = { text: 'Твой ответ верный', ok: true };
+    else if (myAnswer === snap.correct) status = { text: 'Твой ответ верный. Следующий вопрос — на экране эфира' };
     else status = { text: 'Следующий вопрос — на экране эфира' };
   } else if (pending?.questionId === snap.questionId && pending.status === 'rejected' && snap.myAnswer === null) {
-    status = { text: 'Ответ не принят — время вышло' };
+    status = { text: 'Ответ не принят — время вышло', error: true };
   } else if (pending?.questionId === snap.questionId && pending.status === 'failed' && snap.myAnswer === null) {
-    status = { text: 'Ответ не отправился. Проверь интернет и нажми ещё раз' };
+    status = { text: 'Ответ не отправился. Проверь интернет и нажми ещё раз', error: true };
   } else if (myAnswer !== null) {
     status = { text: snap.myAnswer === null && pending?.status === 'sending' ? 'Отправляем ответ…' : 'Ответ принят. Правильный покажем после таймера' };
   } else if (!canAnswer) {
@@ -253,59 +272,61 @@ export function Game({ token, onRemoved }: { token: string; onRemoved: () => voi
 
   return (
     <Screen>
-      <div className="ai-quizbar">
-        <Nick nick={snap.nick} />
-        <span className="ai-timer" style={{ '--p': percent } as CSSProperties}>
-          0:{String(secs).padStart(2, '0')}
-        </span>
-      </div>
+      <Top tag={counter} />
       {offline}
-      <div className="question-meta">
-        <span className="count">{revealed ? `${counter} · ответ` : counter}</span>
-        {snap.double && <span className="ai-tag ai-tag--red">Двойные баллы</span>}
-      </div>
-      {snap.image && (
-        <div className="ai-qimage">
-          <img src={snap.image} alt="" />
-        </div>
-      )}
-      <p className="ai-question">{snap.text}</p>
-      <div className="ai-options">
-        {snap.options?.map((text, i) => {
-          let state = '';
-          let mark = '';
-          let key: ReactNode = LETTERS[i];
-          if (revealed) {
-            if (i === snap.correct) {
-              state = 'is-correct';
-              mark = 'Верно';
-              key = <i className="ai-ico" />;
+      <div className="q-body">
+        {revealed ? (
+          <span className="q-tag q-tag--lime">Время вышло</span>
+        ) : (
+          // Полоса уменьшается через scaleX(доля оставшегося времени), последние 5 секунд — красная.
+          <div className={`q-timer${secs <= 5 ? ' is-low' : ''}`}>
+            <div className="timer">
+              <i style={{ transform: `scaleX(${Math.min(1, timeLeft / total)})` }} />
+            </div>
+            <span className="q-timer__sec">{secs}</span>
+          </div>
+        )}
+        {snap.double && <span className="q-tag">Двойные баллы</span>}
+        {snap.image && (
+          <div className="q-pic">
+            <img src={snap.image} alt="" />
+          </div>
+        )}
+        <h1 className="q-h q-h--question">{snap.text}</h1>
+        <div className="q-opts">
+          {snap.options?.map((text, i) => {
+            let state = '';
+            let note = '';
+            if (revealed) {
+              if (i === snap.correct) {
+                state = 'is-correct';
+                note = 'Верно';
+              } else if (i === myAnswer) {
+                state = 'is-wrong';
+                note = 'Твой ответ';
+              } else state = 'is-dim';
             } else if (i === myAnswer) {
-              state = 'is-wrong';
-              mark = 'Твой ответ';
-              key = <i className="ai-ico ai-ico--cross" />;
-            } else state = 'is-dim';
-          } else if (i === myAnswer) {
-            state = 'is-selected';
-            mark = 'Твой выбор';
-          }
-          return (
-            <button
-              key={i}
-              type="button"
-              className={`ai-option ${state}`}
-              disabled={!canAnswer}
-              aria-pressed={i === myAnswer}
-              onClick={() => snap.questionId !== null && choose(snap.questionId, i)}
-            >
-              <span className="ai-option__key">{key}</span>
-              <span className="ai-option__text">{text}</span>
-              {mark && <span className="ai-option__mark">{mark}</span>}
-            </button>
-          );
-        })}
+              state = 'is-selected';
+              note = 'Твой ответ';
+            } else if (myAnswer !== null) state = 'is-dim';
+            return (
+              <button
+                key={i}
+                type="button"
+                className={`q-opt ${state}`.trim()}
+                disabled={!canAnswer}
+                aria-pressed={i === myAnswer}
+                onClick={() => snap.questionId !== null && choose(snap.questionId, i)}
+              >
+                <span className="q-opt__k">{LETTERS[i]}</span>
+                <span className="q-opt__text">{text}</span>
+                {note && <span className="q-opt__note">{note}</span>}
+              </button>
+            );
+          })}
+        </div>
+        {status && <p className={status.error ? 'q-err' : 'q-s'}>{status.text}</p>}
       </div>
-      {status && <div className={`ai-status${status.ok ? ' ai-status--ok' : ''}`}>{status.text}</div>}
     </Screen>
   );
 }

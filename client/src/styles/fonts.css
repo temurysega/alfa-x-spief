@@ -1,8 +1,8 @@
-/* Шрифты дизайн-системы лежат у нас, а не в Google Fonts: так быстрее и надёжнее из России.
-   Браузер скачивает только нужные наборы символов (кириллица, латиница) — по unicode-range. */
-@import '@fontsource/unbounded/600.css';
-@import '@fontsource/unbounded/700.css';
-@import '@fontsource/onest/400.css';
-@import '@fontsource/onest/500.css';
-@import '@fontsource/onest/600.css';
-@import '@fontsource/jetbrains-mono/500.css';
+/* Шрифт дизайн-системы: Styrene A по брендбуку платный, вместо него — Montserrat тех же начертаний.
+   Файлы лежат у нас, а не в Google Fonts: так быстрее и надёжнее из России. Браузер скачивает
+   только нужные наборы символов (кириллица, латиница) — по unicode-range. */
+@import '@fontsource/montserrat/500.css';
+@import '@fontsource/montserrat/600.css';
+@import '@fontsource/montserrat/700.css';
+@import '@fontsource/montserrat/800.css';
+@import '@fontsource/montserrat/900.css';

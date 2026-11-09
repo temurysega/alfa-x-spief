@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { errorText, request } from '../api';
 import { syncClock } from '../clock';
-import { Wordmark } from '../player/ui';
+import { Lockup } from '../player/ui';
 import '../styles/admin.css';
 import { loadAdminToken, makeApi, saveAdminToken } from './api';
 import { Control } from './Control';
@@ -34,17 +34,14 @@ function LoginForm({ onLogin }: { onLogin: (token: string) => void }) {
     }
   };
   return (
-    <main className="adm-login">
-      <Wordmark size={22} />
-      <h1 className="adm-h1">Пульт ведущего</h1>
-      <form className="stack" onSubmit={submit}>
-        <label className="ai-field" htmlFor="password">
-          <span className="ai-field__label">Пароль</span>
-          <input className="ai-input" id="password" type="password" value={password}
-            onChange={(e) => setPassword(e.target.value)} autoFocus required />
-        </label>
-        {error && <p className="form-error">{error}</p>}
-        <button className="ai-btn ai-btn--primary ai-btn--block" type="submit">Войти</button>
+    <main className="adm adm-page">
+      <form className="adm-card adm-login" onSubmit={submit}>
+        <Lockup />
+        <h1 className="adm-h">Пульт квиза</h1>
+        <input className={`q-input adm-input${error ? ' is-error' : ''}`} type="password" value={password}
+          onChange={(e) => setPassword(e.target.value)} placeholder="Пароль" aria-label="Пароль" autoFocus required />
+        {error && <p className="q-err">{error}</p>}
+        <button className="adm-btn" type="submit">Войти</button>
       </form>
     </main>
   );
@@ -55,6 +52,7 @@ export function Admin() {
   const [tab, setTab] = useState<Tab>('control');
   const [state, setState] = useState<AdminState | null>(null);
   const [offline, setOffline] = useState(false);
+  const [gameError, setGameError] = useState('');
 
   const logout = useCallback(() => {
     saveAdminToken(null);
@@ -99,43 +97,69 @@ export function Admin() {
     );
   }
 
+  const selectGame = async (game: number) => {
+    if (!window.confirm(`Переключиться на игру ${game}? Участники вернутся в лобби.`)) return;
+    setGameError('');
+    try {
+      await api.post('/game', { game });
+      await refresh();
+    } catch (e) {
+      setGameError(errorText(e));
+    }
+  };
+
   const props = { api, state, refresh };
   return (
-    <div className="adm">
-      <header className="adm-top">
-        <Wordmark size={18} />
-        <nav className="adm-tabs">
-          {TABS.map(([id, label]) => (
-            <button key={id} type="button" className={`adm-tab${tab === id ? ' is-on' : ''}`} onClick={() => setTab(id)}>
-              {label}
-            </button>
-          ))}
-        </nav>
-        <button className="ai-btn ai-btn--ghost ai-btn--s" type="button" onClick={logout}>Выйти</button>
+    <main className="adm adm-page">
+      <header className="adm-head">
+        <div className="adm-row" style={{ gap: 24 }}>
+          <Lockup />
+          <span className="adm-h">Пульт квиза</span>
+        </div>
+        <div className="adm-row">
+          {state && (
+            <span className="adm-seg" role="group" aria-label="Игра в эфире">
+              {[1, 2].map((g) => (
+                <button key={g} type="button" className={state.game === g ? 'is-on' : ''}
+                  disabled={state.phase === 'question' || state.game === g} onClick={() => selectGame(g)}>
+                  Игра {g}
+                </button>
+              ))}
+            </span>
+          )}
+          <button className="adm-btn adm-btn--line adm-btn--sm" type="button" onClick={logout}>Выйти</button>
+        </div>
       </header>
 
-      {offline && <div className="adm-alert">Нет связи с сервером — пульт переподключается</div>}
+      <nav className="adm-seg adm-seg--white" aria-label="Разделы пульта">
+        {TABS.map(([id, label]) => (
+          <button key={id} type="button" className={tab === id ? 'is-on' : ''} onClick={() => setTab(id)}>
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      {offline && <div className="adm-alert adm-alert--soft">Нет связи с сервером — пульт переподключается</div>}
+      {gameError && <div className="adm-alert">{gameError}</div>}
       {state?.error && (
-        <div className="adm-alert adm-alert--error" role="alert">
+        <div className="adm-alert" role="alert">
           <div>
-            <b>ОШИБКА</b> · {state.error.where}
-            <div className="adm-alert__text">{state.error.message}</div>
-            <div className="adm-muted">{new Date(state.error.at).toLocaleString('ru-RU')}</div>
+            ОШИБКА / {state.error.where}
+            <div className="adm-alert__text">
+              {state.error.message} / {new Date(state.error.at).toLocaleString('ru-RU')}
+            </div>
           </div>
-          <button className="ai-btn ai-btn--outline ai-btn--s" type="button"
-            onClick={() => api.post('/clear-error').then(refresh)}>
+          <button className="adm-btn adm-btn--sm" type="button" onClick={() => api.post('/clear-error').then(refresh)}>
             Скрыть
           </button>
         </div>
       )}
 
-      <div className="adm-body">
-        {tab === 'control' && <Control {...props} />}
-        {tab === 'questions' && <Questions {...props} />}
-        {tab === 'players' && <Players {...props} />}
-        {tab === 'rating' && <Rating {...props} />}
-        {tab === 'service' && <Service {...props} />}
-      </div>
-    </div>
+      {tab === 'control' && <Control {...props} />}
+      {tab === 'questions' && <Questions {...props} />}
+      {tab === 'players' && <Players {...props} />}
+      {tab === 'rating' && <Rating {...props} />}
+      {tab === 'service' && <Service {...props} />}
+    </main>
   );
 }

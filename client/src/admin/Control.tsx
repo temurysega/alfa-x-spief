@@ -4,11 +4,9 @@ import { serverNow } from '../clock';
 import { LETTERS, type TabProps } from './types';
 
 const PHASES: Record<string, string> = {
-  lobby: 'Лобби',
-  countdown: 'Отсчёт',
-  question: 'Вопрос идёт',
-  revealed: 'Ответ показан',
-  finished: 'Игра окончена',
+  countdown: 'отсчёт',
+  question: 'идёт',
+  revealed: 'ответ показан',
 };
 
 export function Control({ api, state, refresh }: TabProps) {
@@ -20,13 +18,13 @@ export function Control({ api, state, refresh }: TabProps) {
     return () => clearInterval(id);
   }, []);
 
-  if (!state) return <p className="adm-muted">Загружаем…</p>;
+  if (!state) return <p className="q-s">Загружаем…</p>;
 
-  const run = async (path: string, body?: unknown) => {
+  const run = async (path: string) => {
     setBusy(true);
     setError('');
     try {
-      await api.post(path, body);
+      await api.post(path);
       await refresh();
     } catch (e) {
       setError(errorText(e));
@@ -40,104 +38,108 @@ export function Control({ api, state, refresh }: TabProps) {
   const opensAt = q ? Date.parse(q.opensAt) : 0;
   const deadline = q ? Date.parse(q.deadline) : 0;
   const phase = state.phase === 'question' && now < opensAt ? 'countdown' : state.phase;
+  const live = q && (state.phase === 'question' || state.phase === 'revealed');
   const canStart = (state.phase === 'lobby' || state.phase === 'revealed') && state.next;
   const total = state.questions.length;
 
+  let timer = '';
+  if (phase === 'countdown') timer = `через ${Math.ceil((opensAt - now) / 1000)}`;
+  if (phase === 'question') timer = `${Math.max(0, Math.ceil((deadline - now) / 1000))} с`;
+
   return (
-    <section className="adm-stack">
-      <div className="adm-row">
-        <div className="adm-switch" role="group" aria-label="Игра">
-          {[1, 2].map((g) => (
-            <button key={g} type="button" className={`adm-switch__btn${state.game === g ? ' is-on' : ''}`}
-              disabled={busy || state.phase === 'question' || state.game === g}
-              onClick={() => window.confirm(`Переключиться на игру ${g}? Участники вернутся в лобби.`) && run('/game', { game: g })}>
-              Игра {g}
-            </button>
-          ))}
-        </div>
-        <span className={`ai-tag${phase === 'question' || phase === 'countdown' ? ' ai-tag--red' : ' ai-tag--ink'}`}>
-          {PHASES[phase]}
-        </span>
-        <span className="ai-tag">В игре: {state.players}</span>
-      </div>
-
-      {q && (state.phase === 'question' || state.phase === 'revealed') ? (
-        <article className="adm-card adm-live">
-          <div className="adm-live__head">
-            <span className="count">Вопрос {q.no} / {total}</span>
-            {q.double && <span className="ai-tag ai-tag--red">Двойные баллы</span>}
-            <span className="adm-live__timer">
-              {phase === 'countdown' && `Отсчёт ${Math.ceil((opensAt - now) / 1000)}`}
-              {phase === 'question' && `0:${String(Math.max(0, Math.ceil((deadline - now) / 1000))).padStart(2, '0')}`}
-              {phase === 'revealed' && 'Закрыт'}
+    <div className="adm-grid">
+      <section className="adm-card">
+        {live ? (
+          <>
+            <div className="adm-split">
+              <span className="adm-h">
+                Вопрос {q.no} из {total} / {PHASES[phase]}
+              </span>
+              <div className="adm-row">
+                {q.double && <span className="q-tag q-tag--lime">Двойные баллы</span>}
+                {timer ? <span className="adm-timer">{timer}</span> : <span className="q-tag">{q.seconds} с</span>}
+              </div>
+            </div>
+            <div className="adm-row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap' }}>
+              {q.image && <img className="adm-qimg" src={q.image} alt="" />}
+              <p className="adm-qtext">{q.text}</p>
+            </div>
+            <div className="adm-bars">
+              {q.options.map((text, i) => {
+                const n = q.distribution?.[i] ?? 0;
+                const share = q.answered ? Math.round((n / q.answered) * 100) : 0;
+                const correct = phase === 'revealed' && i === q.correct;
+                return (
+                  <div key={i} className={`adm-bar${correct ? ' is-correct' : ''}`}>
+                    <span>{LETTERS[i]}</span>
+                    <div className="adm-bar__track">
+                      <div className="adm-bar__fill" style={{ width: `${q.distribution ? share : 0}%` }} />
+                      <span className="adm-bar__text">{text}</span>
+                    </div>
+                    <span>{q.distribution ? n : ''}</span>
+                  </div>
+                );
+              })}
+            </div>
+            {phase !== 'revealed' && <p className="q-s">Правильный ответ появится, когда закроется таймер</p>}
+          </>
+        ) : (
+          <>
+            <span className="adm-h">
+              {state.phase === 'finished' ? `Игра ${state.game} окончена` : `Лобби / игра ${state.game}`}
             </span>
+            <p className="adm-qtext">
+              {state.phase === 'finished'
+                ? 'Рейтинг и выгрузка — во вкладке «Рейтинг»'
+                : 'Участники входят по ссылке. Запустите первый вопрос, когда будете готовы'}
+            </p>
+            {total === 0 && <p className="q-err">В этой игре нет вопросов — загрузите их во вкладке «Вопросы»</p>}
+          </>
+        )}
+
+        <div className="adm-row">
+          {canStart && (
+            <button className="adm-btn" type="button" disabled={busy} onClick={() => run('/start')}>
+              Запустить вопрос {state.next!.no}
+            </button>
+          )}
+          {(state.phase === 'lobby' || state.phase === 'revealed') && (
+            <button className="adm-btn adm-btn--ghost" type="button" disabled={busy}
+              onClick={() => window.confirm(`Завершить игру ${state.game}? Участники увидят «Спасибо!».`) && run('/finish')}>
+              Завершить игру
+            </button>
+          )}
+          {state.phase === 'revealed' && !state.next && <span className="q-s">Вопросы игры закончились</span>}
+        </div>
+        {error && <p className="q-err">{error}</p>}
+      </section>
+
+      <div className="adm-side">
+        <section className="adm-card adm-stats">
+          <div>
+            <p className="adm-stat">{state.players}</p>
+            <p className="q-s">в игре</p>
           </div>
-          <div className="adm-live__body">
-            {q.image && <img className="adm-live__img" src={q.image} alt="" />}
-            <p className="adm-live__text">{q.text}</p>
+          <div>
+            <p className="adm-stat">{live ? q.answered : '—'}</p>
+            <p className="q-s">ответили</p>
           </div>
-          <div className="adm-big">
-            Ответили: <b>{q.answered}</b> из {state.players}
-          </div>
-          <ul className="adm-options">
-            {q.options.map((text, i) => {
-              const n = q.distribution?.[i] ?? 0;
-              const pct = q.answered ? Math.round((n / q.answered) * 100) : 0;
-              const correct = phase === 'revealed' && i === q.correct;
-              return (
-                <li key={i} className={`adm-option${correct ? ' is-correct' : ''}`}>
-                  <span className="adm-option__key">{LETTERS[i]}</span>
-                  <span className="adm-option__text">{text}</span>
-                  {q.distribution && (
-                    <span className="adm-option__stat">
-                      <span className="adm-bar"><span style={{ width: `${pct}%` }} /></span>
-                      {n} · {pct}%
-                    </span>
-                  )}
+        </section>
+        {total > 0 && (
+          <section className="adm-card">
+            <span className="adm-h">Игра {state.game}</span>
+            <ol className="adm-progress">
+              {state.questions.map((x, i) => (
+                <li key={x.id} className={x.id === state.questionId && state.phase !== 'finished' ? 'is-current' : x.closed ? 'is-done' : ''}>
+                  <span className="adm-progress__no">{i + 1}</span>
+                  <span className="adm-progress__text">{x.text}</span>
+                  {x.double && <span className="q-tag q-tag--lime">×2</span>}
                 </li>
-              );
-            })}
-          </ul>
-          {phase !== 'revealed' && <p className="adm-muted">Правильный ответ появится, когда закроется таймер.</p>}
-        </article>
-      ) : (
-        <article className="adm-card">
-          <p className="adm-big">
-            {state.phase === 'finished'
-              ? `Игра ${state.game} окончена. Рейтинг — во вкладке «Рейтинг».`
-              : `Лобби игры ${state.game}. Участников в игре: ${state.players}.`}
-          </p>
-          {total === 0 && <p className="adm-muted">В этой игре нет вопросов — загрузите их во вкладке «Вопросы».</p>}
-        </article>
-      )}
-
-      <div className="adm-row">
-        {canStart && (
-          <button className="ai-btn ai-btn--primary ai-btn--l" type="button" disabled={busy} onClick={() => run('/start')}>
-            Запустить вопрос {state.next!.no}
-          </button>
+              ))}
+            </ol>
+          </section>
         )}
-        {(state.phase === 'lobby' || state.phase === 'revealed') && (
-          <button className="ai-btn ai-btn--outline ai-btn--l" type="button" disabled={busy}
-            onClick={() => window.confirm(`Завершить игру ${state.game}? Участники увидят «Спасибо!».`) && run('/finish')}>
-            Завершить игру
-          </button>
-        )}
-        {state.phase === 'revealed' && !state.next && <span className="adm-muted">Вопросы игры закончились</span>}
       </div>
-      {error && <p className="form-error">{error}</p>}
-
-      {total > 0 && (
-        <ol className="adm-progress">
-          {state.questions.map((x, i) => (
-            <li key={x.id} className={x.id === state.questionId ? 'is-current' : x.closed ? 'is-done' : ''}>
-              <span className="adm-progress__no">{i + 1}</span>
-              <span className="adm-progress__text">{x.text}</span>
-              {x.double && <span className="ai-tag ai-tag--outline">×2</span>}
-            </li>
-          ))}
-        </ol>
-      )}
-    </section>
+    </div>
   );
 }

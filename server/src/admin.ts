@@ -14,7 +14,8 @@ import { clientInfo, normalizeCode, sameCode } from './players.ts';
 import { rate } from './scoring.ts';
 import { clearSnapshots, markAll, markPlayer, removeSnapshot } from './snapshots.ts';
 
-const LETTERS = ['А', 'Б', 'В', 'Г', 'Д'];
+// Буквы вариантов — как у участника на экране.
+const LETTERS = ['A', 'B', 'C', 'D', 'E'];
 
 function samePassword(given: string): boolean {
   const a = createHash('sha256').update(given).digest();

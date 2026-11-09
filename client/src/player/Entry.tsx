@@ -1,27 +1,19 @@
 import { useState, type FormEvent } from 'react';
 import { errorText, request } from '../api';
 import { saveToken, storageWorks } from './storage';
-import { Pair, Screen, Wordmark } from './ui';
-
-function Bar() {
-  return (
-    <div className="ai-quizbar">
-      <Wordmark />
-      <span className="count">Квиз</span>
-    </div>
-  );
-}
+import { Screen, Top } from './ui';
 
 const STORAGE_PROBLEM =
   'Браузер не даёт сохранить вход — так ты потеряешь ник при обновлении страницы. Открой ссылку в обычном, не приватном окне или в другом браузере';
 
+// К01, К02 — вход и «ник занят».
 export function Join({ notice, onJoined, onLogin }: {
   notice?: string;
   onJoined: (token: string, nick: string, code: string) => void;
   onLogin: () => void;
 }) {
   const [nick, setNick] = useState('');
-  const [error, setError] = useState(notice ?? '');
+  const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
   const submit = async (e: FormEvent) => {
@@ -45,35 +37,32 @@ export function Join({ notice, onJoined, onLogin }: {
 
   return (
     <Screen>
-      <Bar />
-      <div className="hero">
-        <Pair big={['star', 'red']} small={['sphere', 'pink']} />
-      </div>
-      <div>
-        <h1 className="title">Квиз начинается</h1>
-        <p className="sub">Вопросы — на экране эфира, отвечаешь здесь. 30 секунд на ответ.</p>
-      </div>
-      <form className="stack" onSubmit={submit}>
-        <label className="ai-field" htmlFor="nick">
-          <span className="ai-field__label">Твой ник</span>
-          <input
-            className="ai-input"
-            id="nick"
-            value={nick}
-            onChange={(e) => setNick(e.target.value)}
-            placeholder="Например, neuro_masha"
-            autoComplete="off"
-            autoCapitalize="off"
-            maxLength={20}
-            required
-          />
-          <span className="ai-field__hint">Без имени и фамилии — только ник</span>
-        </label>
-        {error && <p className="form-error" role="alert">{error}</p>}
-        <button className="ai-btn ai-btn--primary ai-btn--block ai-btn--l" type="submit" disabled={busy}>
+      <Top />
+      <form className="q-center" onSubmit={submit}>
+        {notice && (
+          <div className="q-card">
+            <p className="q-t">{notice}</p>
+          </div>
+        )}
+        <span className="q-tag">Точка будущего / квиз</span>
+        <h1 className="q-h">Придумай ник для игры</h1>
+        <p className="q-s">Только ник, без имени и фамилии. Вопросы покажут в эфире, отвечать — здесь</p>
+        <input
+          className={`q-input${error ? ' is-error' : ''}`}
+          value={nick}
+          onChange={(e) => setNick(e.target.value)}
+          placeholder="Например, neuro_fox"
+          aria-label="Ник"
+          autoComplete="off"
+          autoCapitalize="off"
+          maxLength={20}
+          required
+        />
+        {error && <p className="q-err" role="alert">{error}</p>}
+        <button className="q-btn" type="submit" disabled={busy}>
           Войти в игру
         </button>
-        <button className="ai-btn ai-btn--ghost ai-btn--block" type="button" onClick={onLogin}>
+        <button className="q-btn q-btn--ghost" type="button" onClick={onLogin}>
           У меня уже есть код
         </button>
       </form>
@@ -105,27 +94,21 @@ export function Login({ onDone, onBack }: { onDone: (token: string) => void; onB
 
   return (
     <Screen>
-      <Bar />
-      <div>
-        <h1 className="title">Вход по коду</h1>
-        <p className="sub">Код был на экране после первого входа — поищи его в скриншотах.</p>
-      </div>
-      <form className="stack" onSubmit={submit}>
-        <label className="ai-field" htmlFor="login-nick">
-          <span className="ai-field__label">Твой ник</span>
-          <input className="ai-input" id="login-nick" value={nick} onChange={(e) => setNick(e.target.value)}
-            autoComplete="off" autoCapitalize="off" maxLength={20} required />
-        </label>
-        <label className="ai-field" htmlFor="login-code">
-          <span className="ai-field__label">Секретный код</span>
-          <input className="ai-input code-input" id="login-code" value={code} onChange={(e) => setCode(e.target.value)}
-            autoComplete="off" autoCapitalize="characters" maxLength={12} required />
-        </label>
-        {error && <p className="form-error" role="alert">{error}</p>}
-        <button className="ai-btn ai-btn--primary ai-btn--block ai-btn--l" type="submit" disabled={busy}>
+      <Top />
+      <form className="q-center" onSubmit={submit}>
+        <span className="q-tag">Точка будущего / квиз</span>
+        <h1 className="q-h">Вход по коду</h1>
+        <p className="q-s">Код был на экране после первого входа — поищи его в скриншотах</p>
+        <input className={`q-input${error ? ' is-error' : ''}`} value={nick} onChange={(e) => setNick(e.target.value)}
+          placeholder="Ник" aria-label="Ник" autoComplete="off" autoCapitalize="off" maxLength={20} required />
+        <input className={`q-input${error ? ' is-error' : ''}`} value={code} onChange={(e) => setCode(e.target.value)}
+          placeholder="Секретный код" aria-label="Секретный код" autoComplete="off" autoCapitalize="characters"
+          maxLength={12} required />
+        {error && <p className="q-err" role="alert">{error}</p>}
+        <button className="q-btn" type="submit" disabled={busy}>
           Войти
         </button>
-        <button className="ai-btn ai-btn--ghost ai-btn--block" type="button" onClick={onBack}>
+        <button className="q-btn q-btn--ghost" type="button" onClick={onBack}>
           Назад
         </button>
       </form>
@@ -133,29 +116,24 @@ export function Login({ onDone, onBack }: { onDone: (token: string) => void; onB
   );
 }
 
-// Код показывается один раз (ТЗ, п. 4): нигде больше его не увидеть.
+// К03 — секретный код. Показывается один раз (ТЗ, п. 4): нигде больше его не увидеть.
 export function CodeReveal({ nick, code, onNext }: { nick: string; code: string; onNext: () => void }) {
   return (
     <Screen>
-      <Bar />
-      <div>
-        <h1 className="title">Сделай скриншот</h1>
-        <p className="sub">Это твой секретный код. Больше мы его не покажем.</p>
+      <Top tag={nick} tagClass="q-tag--line" />
+      <div className="q-center">
+        <span className="sticker sticker--sm code-sticker">Сделай скриншот</span>
+        <h1 className="q-h">Твой секретный код</h1>
+        <p className="q-code">{code}</p>
+        <p className="q-t">
+          По коду войдёшь с другого устройства и во вторую игру 12.11, а если победишь — подтвердишь, что это ты.
+          Больше мы его не покажем
+        </p>
+        <p className="q-s">Никому не показывай код: по нему можно войти под твоим ником</p>
+        <button className="q-btn" type="button" onClick={onNext}>
+          Скриншот сделан
+        </button>
       </div>
-      <div className="code-card">
-        <span className="ai-field__label code-card__label">Ник · {nick}</span>
-        <span className="code-card__code">{code}</span>
-        <span className="ai-field__label code-card__label">Секретный код</span>
-      </div>
-      <ul className="code-uses">
-        <li>войти с другого телефона или компьютера</li>
-        <li>продолжить во второй части квиза 12.11</li>
-        <li>подтвердить, что победитель — это ты</li>
-      </ul>
-      <p className="sub">Никому его не показывай: по коду можно войти под твоим ником.</p>
-      <button className="ai-btn ai-btn--primary ai-btn--block ai-btn--l" type="button" onClick={onNext}>
-        Скриншот сделан
-      </button>
     </Screen>
   );
 }
@@ -163,10 +141,10 @@ export function CodeReveal({ nick, code, onNext }: { nick: string; code: string;
 export function NoStorage() {
   return (
     <Screen>
-      <Bar />
-      <div>
-        <h1 className="title">Открой в другом окне</h1>
-        <p className="sub">{STORAGE_PROBLEM}.</p>
+      <Top />
+      <div className="q-center">
+        <h1 className="q-h">Открой в другом окне</h1>
+        <p className="q-t">{STORAGE_PROBLEM}</p>
       </div>
     </Screen>
   );

@@ -1,0 +1,189 @@
+/* «Точка будущего» · выжимка из дизайн-системы по брендбуку «Альфа-Будущее» (brand.css Софьи) —
+   только то, что нужно квизу: цвета, логоблок, искра, стикер, акцентная типографика, таймер,
+   экраны участника (q-…) и пульт ведущего (adm-…). Источник правды — исходный brand.css.
+   Шрифт Montserrat подключается локально в fonts.css, без Google Fonts. */
+
+:root {
+  /* Основные цвета для внешних коммуникаций (брендбук, с. 13–15) */
+  --red: #EF3124;     /* фирменный красный: фоны, логотип, акценты */
+  --white: #FFFFFF;
+  /* Нейтральные — для читаемого текста на слайдах */
+  --paper: #F2F2F2;   /* светлый фон слайдов и постов */
+  --ink: #141414;     /* основной текст */
+  --muted: #5C5C5C;   /* подписи, не мельче 30px */
+  --line: #D9D9D9;
+  /* Дополнительная палитра — только акцентами (digital) */
+  --lime: #A8F000;    /* Warm green: плашки, маркер, «верно» */
+  --violet: #9933FF;  /* Warm violet: только в 2D-графике и выделении слова */
+
+  --font: "Styrene A", "Styrene A Web", "Montserrat", system-ui, sans-serif;
+  --r: 32px;          /* радиус карточек и фото на слайде */
+}
+
+/* Фоны. На одном макете — один фон. Чёрного фона нет (брендбук: чёрный только в мерче) */
+.on-paper { background: var(--paper); color: var(--ink); }
+.on-white { background: var(--white); color: var(--ink); }
+.on-red   { background: var(--red);   color: var(--white); }
+.on-lime  { background: var(--lime);  color: var(--ink); }   /* дополнительная палитра, редко */
+
+/* ---------- Акцентная типографика (брендбук, с. 18–21) ----------
+   Styrene A Black, верхний регистр, одна сторона растянута по вертикали.
+   Только 1–2 слова. Длинные фразы и основной текст — без трансформации. */
+.warp {
+  display: inline-block; white-space: nowrap;
+  font-weight: 900; text-transform: uppercase;
+  line-height: .78; letter-spacing: -.035em;
+  transform-origin: 0 50%;
+  transform: perspective(var(--wp, 1400px)) rotateY(var(--wa, 34deg));
+}
+.warp--top    { transform-origin: 0 0; }      /* привязка по верхнему краю */
+.warp--bottom { transform-origin: 0 100%; }   /* по нижнему краю */
+.warp--rev    { transform-origin: 100% 50%; transform: perspective(var(--wp, 1400px)) rotateY(calc(var(--wa, 34deg) * -1)); }
+
+/* ---------- Логоблок (брендбук, с. 5–11) ----------
+   --h — высота плашки «Альфа-Будущее». Плашка «Альфа Банк» = h/2,5,
+   её ширина x = 1,259h. Отступ до зоны партнёра x/5, зона x × 0,8h.
+   Логотип Фонда «Контент» — одним цветом, без подложки: тёмный на светлом фоне,
+   белый на красном. Он заполняет зону по ширине и стоит по центральной оси. */
+.lockup {
+  --h: 96px;
+  display: inline-flex; align-items: center; flex: none;
+  gap: calc(var(--h) * .2518);
+  line-height: 0;
+}
+.lockup__ab { height: var(--h); width: auto; display: block; }
+.lockup__box {
+  width: calc(var(--h) * 1.259); height: calc(var(--h) * .8);
+  display: grid; place-items: center; flex: none;
+}
+.lockup__box img { width: 100%; height: auto; display: block; }
+
+/* ---------- Знак ИИ: пиксельная искра ---------- */
+.spark { display: block; width: var(--s, 200px); height: var(--s, 200px); fill: var(--lime); shape-rendering: crispEdges; flex: none; }
+.spark--red { fill: var(--red); }
+.spark--white { fill: var(--white); }
+.plus { display: block; width: var(--s, 48px); height: var(--s, 48px); fill: var(--white); shape-rendering: crispEdges; flex: none; }
+.plus--red { fill: var(--red); }
+.plus--ink { fill: var(--ink); }
+
+/* Стикер: наклонная плашка с коротким текстом (до 3 слов) */
+.sticker {
+  display: inline-block; width: max-content; max-width: 100%;
+  background: var(--lime); color: var(--ink);
+  font-weight: 900; font-size: 56px; line-height: .98; letter-spacing: -.02em; text-transform: uppercase;
+  padding: .2em .34em .16em; border-radius: .2em;
+  transform: rotate(var(--rot, -3deg));
+}
+.sticker--red   { background: var(--red);   color: var(--white); }
+.sticker--white { background: var(--white); color: var(--ink); }
+.sticker--sm { font-size: 36px; }
+
+.ico { display: inline-block; width: var(--ico, 1em); height: var(--ico, 1em); flex: none; vertical-align: -.12em; }
+.ico circle { fill: var(--lime); }
+.ico path { fill: none; stroke: var(--ink); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.ico--no circle { fill: var(--red); }
+.ico--no path { stroke: var(--white); }
+.on-red .ico--no circle { fill: var(--white); }
+.on-red .ico--no path { stroke: var(--red); }
+
+/* Таймер задания: полоса убывает за --t (например, --t:420s = 7 минут) */
+.timer { height: 28px; border-radius: 999px; background: rgba(20,20,20,.12); overflow: hidden; }
+.on-red .timer { background: rgba(255,255,255,.28); }
+.timer > i { display: block; height: 100%; width: 100%; background: var(--lime); border-radius: inherit; transform-origin: 0 50%; }
+
+/* =====================================================================
+   Интерфейс веб-квиза: клиент участника (телефон) и пульт ведущего.
+   Классы q-… Размеры в px под телефон 360–430px. Лёгкая страница: без анимаций,
+   кроме таймера. Состояния варианта: is-selected, is-correct, is-wrong, is-dim.
+   ===================================================================== */
+.q-screen {
+  width: min(390px, 100%); min-height: 760px; box-sizing: border-box;
+  background: var(--paper); color: var(--ink); font-family: var(--font); font-weight: 500;
+  padding: 16px 16px calc(28px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 20px;
+  -webkit-font-smoothing: antialiased;
+}
+.q-screen * { box-sizing: border-box; margin: 0; }
+.q-screen.on-red { background: var(--red); color: var(--white); }
+.q-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; }
+.q-top .lockup { --h: 30px; }
+.q-body { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+.q-center { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+.q-h { font-weight: 800; font-size: 28px; line-height: 1.1; letter-spacing: -.02em; }
+.q-t { font-size: 18px; line-height: 1.4; }
+.q-s { font-size: 15px; line-height: 1.4; color: var(--muted); }
+.on-red .q-s { color: rgba(255,255,255,.85); }
+.q-tag { display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 999px; background: var(--red); color: var(--white); font-weight: 700; font-size: 14px; white-space: nowrap; align-self: flex-start; }
+.q-tag--white { background: var(--white); color: var(--red); }
+.q-tag--lime { background: var(--lime); color: var(--ink); }
+.q-tag--line { background: transparent; color: inherit; box-shadow: inset 0 0 0 2px currentColor; }
+
+.q-input {
+  width: 100%; height: 58px; border-radius: 16px; border: 2px solid var(--line); background: var(--white);
+  padding: 0 18px; font: 600 20px/1 var(--font); color: var(--ink); outline: none;
+}
+.q-input:focus { border-color: var(--red); }
+.q-input.is-error { border-color: var(--red); background: #FFF1F0; }
+.q-err { color: var(--red); font-weight: 600; font-size: 15px; }
+.q-btn {
+  width: 100%; min-height: 60px; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--red); color: var(--white); font: 800 18px/1 var(--font); letter-spacing: -.01em;
+}
+.q-btn:disabled { opacity: .4; cursor: default; }
+.q-btn--white { background: var(--white); color: var(--red); }
+.q-btn--ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
+
+.q-card { background: var(--white); border-radius: 20px; padding: 20px; color: var(--ink); }
+.q-pic { border-radius: 16px; overflow: hidden; background: #E3E3E3; aspect-ratio: 16 / 9; display: grid; place-items: center; color: #8A8A8A; font-weight: 600; font-size: 14px; }
+.q-pic > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.q-opts { display: grid; gap: 10px; }
+.q-opt {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; text-align: left;
+  background: var(--white); color: var(--ink); border: 0; border-radius: 16px; padding: 10px 14px;
+  font: 600 18px/1.2 var(--font); cursor: pointer; position: relative;
+}
+.q-opt__k { flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--red); color: var(--white); font-weight: 900; font-size: 17px; }
+.q-opt__note { margin-left: auto; flex: none; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; }
+.q-opt.is-selected { box-shadow: inset 0 0 0 3px var(--ink); }
+.q-opt.is-selected .q-opt__k { background: var(--ink); }
+.q-opt.is-correct { background: var(--lime); }
+.q-opt.is-correct .q-opt__k { background: var(--ink); }
+.q-opt.is-wrong { background: var(--red); color: var(--white); }
+.q-opt.is-wrong .q-opt__k { background: var(--white); color: var(--red); }
+.q-opt.is-dim { opacity: .45; }
+.q-opt:disabled { cursor: default; }
+
+.q-timer { display: flex; align-items: center; gap: 12px; }
+.q-timer__sec { font-weight: 900; font-size: 28px; width: 44px; text-align: right; font-variant-numeric: tabular-nums; }
+.q-timer .timer { flex: 1; height: 14px; }
+.q-timer.is-low .timer > i { background: var(--red); }
+
+.q-code { font-weight: 900; font-size: 64px; letter-spacing: .12em; text-align: center; line-height: 1; padding: 28px 0; background: var(--white); color: var(--ink); border-radius: 20px; box-shadow: inset 0 0 0 3px var(--ink); }
+.q-count { font-weight: 900; font-size: 220px; line-height: .8; letter-spacing: -.05em; text-align: center; }
+
+/* Пульт ведущего (ноутбук) */
+.adm { width: min(1280px, 100%); box-sizing: border-box; background: var(--paper); color: var(--ink); font-family: var(--font); font-weight: 500; font-size: 16px; padding: 20px 28px 32px; display: grid; gap: 20px; }
+.adm * { box-sizing: border-box; margin: 0; }
+.adm-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.adm-head .lockup { --h: 36px; }
+.adm-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start; }
+.adm-card { background: var(--white); border-radius: 20px; padding: 24px; display: grid; gap: 16px; align-content: start; }
+.adm-h { font-weight: 800; font-size: 22px; letter-spacing: -.01em; }
+.adm-stat { font-weight: 900; font-size: 48px; line-height: 1; color: var(--red); }
+.adm-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.adm-btn { height: 48px; padding: 0 22px; border: 0; border-radius: 999px; background: var(--red); color: var(--white); font: 800 16px/1 var(--font); cursor: pointer; }
+.adm-btn--ghost { background: var(--paper); color: var(--ink); }
+.adm-seg { display: inline-flex; background: var(--paper); border-radius: 999px; padding: 4px; }
+.adm-seg > span { height: 36px; padding: 0 16px; border-radius: 999px; display: inline-flex; align-items: center; font-weight: 700; }
+.adm-seg > .is-on { background: var(--ink); color: var(--white); }
+.adm-bar { display: grid; grid-template-columns: 32px 1fr 44px; align-items: center; gap: 12px; font-weight: 700; }
+.adm-bar__track { height: 28px; border-radius: 8px; background: var(--paper); overflow: hidden; }
+.adm-bar__fill { height: 100%; background: var(--line); border-radius: 8px; }
+.adm-bar.is-correct .adm-bar__fill { background: var(--lime); }
+.adm-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.adm-table th { text-align: left; font-weight: 700; color: var(--muted); padding: 8px 10px; border-bottom: 2px solid var(--line); }
+.adm-table td { padding: 10px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.adm-table tr.is-top td:first-child { color: var(--red); font-weight: 900; }
+.adm-alert { background: var(--red); color: var(--white); border-radius: 14px; padding: 12px 16px; font-weight: 700; }
+@media (max-width: 900px) { .adm-grid { grid-template-columns: 1fr; } }

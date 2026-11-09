@@ -29,24 +29,26 @@ function Verify({ api }: Pick<TabProps, 'api'>) {
         !r.found
           ? { text: 'Такого ника нет', ok: false }
           : r.match
-            ? { text: 'Код совпадает — это тот самый участник', ok: true }
-            : { text: 'Код НЕ совпадает', ok: false },
+            ? { text: 'Код совпадает', ok: true }
+            : { text: 'Код не совпадает', ok: false },
       );
     } catch (err) {
       setResult({ text: errorText(err), ok: false });
     }
   };
   return (
-    <article className="adm-card">
-      <h2 className="adm-h2">Проверка победителя</h2>
-      <p className="adm-muted">Победитель присылает свой секретный код. Сверяем пару «ник — код».</p>
-      <form className="adm-row" onSubmit={submit}>
-        <input className="ai-input adm-search" placeholder="Ник" value={nick} onChange={(e) => setNick(e.target.value)} required />
-        <input className="ai-input adm-search code-input" placeholder="Код" value={code} onChange={(e) => setCode(e.target.value)} required />
-        <button className="ai-btn ai-btn--primary ai-btn--s" type="submit">Проверить</button>
+    <section className="adm-card">
+      <span className="adm-h">Проверить победителя</span>
+      <p className="q-s">Победитель присылает свой секретный код. Сверяем пару «ник — код»</p>
+      <form className="adm-row" style={{ flexWrap: 'nowrap' }} onSubmit={submit}>
+        <input className="q-input adm-input" placeholder="Ник" aria-label="Ник" value={nick}
+          onChange={(e) => setNick(e.target.value)} required />
+        <input className="q-input adm-input adm-input--sm" placeholder="Код" aria-label="Код" value={code}
+          onChange={(e) => setCode(e.target.value)} required />
+        <button className="adm-btn" type="submit">Проверить</button>
       </form>
-      {result && <div className={`ai-status${result.ok ? ' ai-status--ok' : ''}`}>{result.text}</div>}
-    </article>
+      {result && <span className={`q-tag${result.ok ? ' q-tag--lime' : ''}`}>{result.text}</span>}
+    </section>
   );
 }
 
@@ -64,14 +66,15 @@ function Journal({ api }: Pick<TabProps, 'api'>) {
     }
   };
   return (
-    <article className="adm-card">
-      <h2 className="adm-h2">Журнал</h2>
-      <p className="adm-muted">Входы, ответы и команды со временем, IP и браузером — для споров о победителях. Пустой ник — последние 300 записей.</p>
+    <section className="adm-card">
+      <span className="adm-h">Журнал</span>
+      <p className="q-s">Входы, ответы и команды со временем, IP и браузером — для споров о победителях. Пустой ник — последние 300 записей</p>
       <form className="adm-row" onSubmit={submit}>
-        <input className="ai-input adm-search" placeholder="Ник" value={nick} onChange={(e) => setNick(e.target.value)} />
-        <button className="ai-btn ai-btn--outline ai-btn--s" type="submit">Показать</button>
+        <input className="q-input adm-input" style={{ width: 240 }} placeholder="Ник" aria-label="Ник" value={nick}
+          onChange={(e) => setNick(e.target.value)} />
+        <button className="adm-btn adm-btn--ghost adm-btn--sm" type="submit">Показать</button>
       </form>
-      {error && <p className="form-error">{error}</p>}
+      {error && <p className="q-err">{error}</p>}
       {rows && (
         <table className="adm-table adm-table--small">
           <thead>
@@ -89,7 +92,7 @@ function Journal({ api }: Pick<TabProps, 'api'>) {
           </tbody>
         </table>
       )}
-    </article>
+    </section>
   );
 }
 
@@ -110,28 +113,30 @@ function Reset({ api, refresh }: Pick<TabProps, 'api' | 'refresh'>) {
     }
   };
   return (
-    <article className="adm-card">
-      <h2 className="adm-h2">Сброс после прогона</h2>
-      <p className="adm-muted">Прогнали игру с командой — обнуляем перед эфиром. Вопросы не удаляются.</p>
+    <section className="adm-card">
+      <span className="adm-h">Сброс после прогона</span>
+      <p className="q-s">Прогнали игру с командой — обнуляем перед эфиром. Вопросы не удаляются</p>
       <div className="adm-row">
-        <button className="ai-btn ai-btn--outline ai-btn--s" type="button" onClick={() => reset('progress')}>
+        <button className="adm-btn adm-btn--ghost adm-btn--sm" type="button" onClick={() => reset('progress')}>
           Сбросить ответы и запуски
         </button>
-        <button className="ai-btn ai-btn--red ai-btn--s" type="button" onClick={() => reset('all')}>
+        <button className="adm-btn adm-btn--sm" type="button" onClick={() => reset('all')}>
           Полный сброс с участниками
         </button>
       </div>
-      {msg && <div className="ai-status">{msg}</div>}
-    </article>
+      {msg && <span className="q-tag q-tag--lime">{msg}</span>}
+    </section>
   );
 }
 
 export function Service({ api, refresh }: TabProps) {
   return (
-    <section className="adm-stack">
-      <Verify api={api} />
+    <>
+      <div className="adm-grid">
+        <Verify api={api} />
+        <Reset api={api} refresh={refresh} />
+      </div>
       <Journal api={api} />
-      <Reset api={api} refresh={refresh} />
-    </section>
+    </>
   );
 }

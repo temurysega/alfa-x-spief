@@ -44,4 +44,5 @@ export type Question = {
 
 export type TabProps = { api: Api; state: AdminState | null; refresh: () => void };
 
-export const LETTERS = ['А', 'Б', 'В', 'Г', 'Д'];
+// Буквы вариантов — латинские, как в макетах квиза и на слайдах.
+export const LETTERS = ['A', 'B', 'C', 'D', 'E'];

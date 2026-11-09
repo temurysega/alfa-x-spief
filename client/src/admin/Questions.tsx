@@ -126,69 +126,73 @@ export function Questions({ api, state }: TabProps) {
   };
 
   return (
-    <section className="adm-stack">
-      <div className="adm-row">
-        <div className="adm-switch" role="group" aria-label="Игра">
-          {[1, 2].map((g) => (
-            <button key={g} type="button" className={`adm-switch__btn${game === g ? ' is-on' : ''}`} onClick={() => setGame(g)}>
-              Игра {g}
+    <>
+      <section className="adm-card">
+        <div className="adm-split">
+          <div className="adm-row">
+            <span className="adm-h">Вопросы</span>
+            <span className="adm-seg" role="group" aria-label="Вопросы какой игры">
+              {[1, 2].map((g) => (
+                <button key={g} type="button" className={game === g ? 'is-on' : ''} onClick={() => setGame(g)}>
+                  Игра {g}
+                </button>
+              ))}
+            </span>
+          </div>
+          <div className="adm-row">
+            <button className="adm-btn adm-btn--sm" type="button" disabled={busy}
+              onClick={() => setDraft({ ...EMPTY, options: [...EMPTY.options] })}>
+              Добавить вопрос
             </button>
-          ))}
+            <label className="adm-btn adm-btn--ghost adm-btn--sm adm-btn--file">
+              Загрузить файл
+              <input type="file" hidden multiple accept=".json,.csv,image/*" onChange={importFiles} disabled={busy} />
+            </label>
+            <button className="adm-btn adm-btn--ghost adm-btn--sm" type="button" onClick={exportJson} disabled={!list.length}>
+              Скачать JSON
+            </button>
+          </div>
         </div>
-        <button className="ai-btn ai-btn--primary ai-btn--s" type="button" disabled={busy}
-          onClick={() => setDraft({ ...EMPTY, options: [...EMPTY.options] })}>
-          Добавить вопрос
-        </button>
-        <label className="ai-btn ai-btn--outline ai-btn--s">
-          Загрузить файл
-          <input type="file" hidden multiple accept=".json,.csv,image/*" onChange={importFiles} disabled={busy} />
-        </label>
-        <button className="ai-btn ai-btn--ghost ai-btn--s" type="button" onClick={exportJson} disabled={!list.length}>
-          Скачать JSON
-        </button>
-      </div>
-      <p className="adm-muted">
-        Файл — JSON или CSV, вместе с ним можно выбрать картинки, на которые он ссылается по имени. Примеры — в папке
-        questions репозитория. Загрузка заменяет все вопросы выбранной игры.
-      </p>
-      {busy && <p className="adm-muted">Секунду…</p>}
-      {error && <p className="form-error">{error}</p>}
-      {info && <div className="ai-status ai-status--ok">{info}</div>}
+        <p className="q-s">
+          Файл — JSON или CSV, вместе с ним можно выбрать картинки, на которые он ссылается по имени. Примеры — в папке
+          questions репозитория. Загрузка заменяет все вопросы выбранной игры
+        </p>
+        {busy && <p className="q-s">Секунду…</p>}
+        {error && <p className="q-err">{error}</p>}
+        {info && <span className="q-tag q-tag--lime">{info}</span>}
+      </section>
 
       {draft && (
-        <article className="adm-card adm-editor">
-          <h2 className="adm-h2">{draft.id ? 'Изменить вопрос' : 'Новый вопрос'}</h2>
-          <label className="ai-field">
-            <span className="ai-field__label">Вопрос</span>
-            <textarea className="ai-input adm-textarea" value={draft.text} maxLength={300}
-              onChange={(e) => setDraft({ ...draft, text: e.target.value })} />
-          </label>
+        <section className="adm-card">
+          <span className="adm-h">{draft.id ? 'Изменить вопрос' : 'Новый вопрос'}</span>
+          <textarea className="q-input adm-textarea" value={draft.text} maxLength={300} placeholder="Текст вопроса"
+            aria-label="Текст вопроса" onChange={(e) => setDraft({ ...draft, text: e.target.value })} />
           <div className="adm-row">
             {draft.image && <img className="adm-thumb" src={draft.image} alt="" />}
-            <label className="ai-btn ai-btn--outline ai-btn--s">
-              {draft.image ? 'Другая картинка' : 'Добавить картинку'}
+            <label className="adm-btn adm-btn--ghost adm-btn--sm adm-btn--file">
+              {draft.image ? 'Другая картинка' : 'Добавить картинку 16 : 9'}
               <input type="file" hidden accept="image/*" onChange={pickImage} />
             </label>
             {draft.image && (
-              <button className="ai-btn ai-btn--ghost ai-btn--s" type="button" onClick={() => setDraft({ ...draft, image: null })}>
-                Убрать картинку
+              <button className="adm-link" type="button" onClick={() => setDraft({ ...draft, image: null })}>
+                убрать картинку
               </button>
             )}
           </div>
-          <span className="ai-field__label">Варианты — отметьте правильный. Пустые не попадут в игру</span>
+          <p className="q-s">Варианты — отметьте правильный. Пустые не попадут в игру</p>
           {draft.options.map((o, i) => (
             <div key={i} className="adm-opt-edit">
               <input type="radio" name="correct" checked={draft.correct === i} aria-label={`Правильный — ${LETTERS[i]}`}
                 onChange={() => setDraft({ ...draft, correct: i })} />
-              <span className="adm-option__key">{LETTERS[i]}</span>
-              <input className="ai-input" value={o} maxLength={120}
+              <span className="adm-opt__k">{LETTERS[i]}</span>
+              <input className="q-input adm-input" value={o} maxLength={120} aria-label={`Вариант ${LETTERS[i]}`}
                 onChange={(e) => setDraft({ ...draft, options: draft.options.map((x, k) => (k === i ? e.target.value : x)) })} />
             </div>
           ))}
           <div className="adm-row">
-            <label className="ai-field adm-seconds">
-              <span className="ai-field__label">Секунд на ответ</span>
-              <input className="ai-input" type="number" min={5} max={300} value={draft.seconds}
+            <label className="adm-check">
+              Секунд на ответ
+              <input className="q-input adm-input adm-input--sm" type="number" min={5} max={300} value={draft.seconds}
                 onChange={(e) => setDraft({ ...draft, seconds: Number(e.target.value) })} />
             </label>
             <label className="adm-check">
@@ -197,47 +201,47 @@ export function Questions({ api, state }: TabProps) {
             </label>
           </div>
           <div className="adm-row">
-            <button className="ai-btn ai-btn--primary" type="button" onClick={save} disabled={busy}>Сохранить</button>
-            <button className="ai-btn ai-btn--ghost" type="button" onClick={() => setDraft(null)}>Отмена</button>
+            <button className="adm-btn" type="button" onClick={save} disabled={busy}>Сохранить</button>
+            <button className="adm-btn adm-btn--ghost" type="button" onClick={() => setDraft(null)}>Отмена</button>
           </div>
-        </article>
+        </section>
       )}
 
-      {list.length === 0 && <p className="adm-big">В игре {game} пока нет вопросов.</p>}
+      {list.length === 0 && <p className="adm-qtext">В игре {game} пока нет вопросов</p>}
       <ol className="adm-qlist">
         {list.map((q, i) => (
           <li key={q.id} className="adm-card adm-q">
-            <span className="ai-card__num">{String(i + 1).padStart(2, '0')}</span>
+            <span className="adm-q__no">{i + 1}</span>
             <div className="adm-q__body">
               <div className="adm-row">
-                <span className="ai-tag">{q.seconds} с</span>
-                {q.double && <span className="ai-tag ai-tag--red">Двойные баллы</span>}
-                {q.opened && <span className="ai-tag ai-tag--ink">Уже запускали</span>}
+                <span className="q-tag">{q.seconds} с</span>
+                {q.double && <span className="q-tag q-tag--lime">Двойные баллы</span>}
+                {q.opened && <span className="q-tag q-tag--line">Уже запускали</span>}
               </div>
-              <p className="adm-q__text">{q.text}</p>
+              <p className="adm-qtext">{q.text}</p>
               {q.image && <img className="adm-thumb" src={q.image} alt="" />}
-              <ul className="adm-options">
+              <ul className="adm-opts">
                 {q.options.map((o, k) => (
-                  <li key={k} className={`adm-option${k === q.correct ? ' is-correct' : ''}`}>
-                    <span className="adm-option__key">{k === q.correct ? <i className="ai-ico" /> : LETTERS[k]}</span>
-                    <span className="adm-option__text">{o}</span>
+                  <li key={k} className={`adm-opt${k === q.correct ? ' is-correct' : ''}`}>
+                    <span className="adm-opt__k">{LETTERS[k]}</span>
+                    <span>{o}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div className="adm-q__actions">
-              <button className="ai-btn ai-btn--ghost ai-btn--s" type="button" disabled={busy || i === 0}
+              <button className="adm-btn adm-btn--ghost adm-btn--sm" type="button" disabled={busy || i === 0}
                 onClick={() => act(() => api.post('/questions/move', { id: q.id, dir: -1 }))} aria-label="Выше">↑</button>
-              <button className="ai-btn ai-btn--ghost ai-btn--s" type="button" disabled={busy || i === list.length - 1}
+              <button className="adm-btn adm-btn--ghost adm-btn--sm" type="button" disabled={busy || i === list.length - 1}
                 onClick={() => act(() => api.post('/questions/move', { id: q.id, dir: 1 }))} aria-label="Ниже">↓</button>
-              <button className="ai-btn ai-btn--outline ai-btn--s" type="button" disabled={busy || q.opened}
+              <button className="adm-btn adm-btn--ghost adm-btn--sm" type="button" disabled={busy || q.opened}
                 onClick={() => setDraft({
                   id: q.id, text: q.text, image: q.image, correct: q.correct, seconds: q.seconds, double: q.double,
                   options: [...q.options, '', '', '', ''].slice(0, 5),
                 })}>
                 Изменить
               </button>
-              <button className="ai-btn ai-btn--ghost ai-btn--s" type="button" disabled={busy || q.opened}
+              <button className="adm-btn adm-btn--ghost adm-btn--sm" type="button" disabled={busy || q.opened}
                 onClick={() => window.confirm('Удалить вопрос?') && act(() => api.post('/questions/delete', { id: q.id }))}>
                 Удалить
               </button>
@@ -245,6 +249,6 @@ export function Questions({ api, state }: TabProps) {
           </li>
         ))}
       </ol>
-    </section>
+    </>
   );
 }

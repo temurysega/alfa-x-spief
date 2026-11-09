@@ -1,69 +1,52 @@
-/* Экраны участника. Только токены дизайн-системы, новых цветов нет. */
+/* Экраны участника на настоящем телефоне. Разметка и классы — из quiz.html дизайн-системы,
+   здесь только то, чего нет в макетах: экран во всю высоту, красный фон страницы, низкие экраны. */
 
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; }
-body { min-height: 100vh; min-height: 100dvh; }
+body { min-height: 100vh; min-height: 100dvh; background: var(--paper); font-family: var(--font); }
+html[data-tone='red'] body { background: var(--red); }
 button { font-family: inherit; }
 
 /* Высота — min-height, не height: если текст ровно в экран, прокрутка не ломается.
-   Снизу запас под панель мобильного Яндекс.Браузера и безопасную зону. */
-.screen {
+   Снизу запас под панель мобильного Яндекс.Браузера и безопасную зону (он уже в q-screen). */
+.q-screen {
+  width: 100%;
   max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: max(16px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  padding-top: max(16px, env(safe-area-inset-top));
 }
-.stack { display: flex; flex-direction: column; gap: 14px; }
+.q-center--middle { align-items: center; text-align: center; }
+.q-center--middle .q-tag { align-self: center; }
+.q-h--xl { font-size: 40px; }
+.q-h--question { font-size: 22px; }
+.q-t--strong { font-weight: 800; }
+.q-opt__text { min-width: 0; overflow-wrap: anywhere; }
+.q-opt:focus-visible, .q-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.on-red .q-btn:focus-visible { outline-color: var(--white); }
+.q-input::placeholder { color: var(--muted); font-weight: 500; }
+/* Белая карточка на красном экране: подписи внутри — тёмные, а не белые, как на красном */
+.q-card .q-t { color: var(--ink); }
+.q-card .q-s { color: var(--muted); }
 
-.hero { display: grid; place-items: center; padding: 8px 0; }
-.hero .ai-pair { --ps: 200px; }
-.title { font: 600 34px/1.02 var(--font-display); letter-spacing: -0.03em; margin: 0; text-wrap: balance; }
-.sub { margin: 10px 0 0; color: var(--ink-muted); font-size: 19px; line-height: 1.4; }
-.nick { display: inline-flex; align-items: center; gap: 8px; font: 500 15px/1 var(--font-mono); color: var(--ink-muted); min-width: 0; overflow-wrap: anywhere; }
-.count { font: 500 14px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
-.form-error { margin: 0; color: var(--red-ink); font-size: 16px; line-height: 1.35; }
-.code-input { font-family: var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
-
-.code-card {
-  background: var(--ink);
-  color: var(--on-ink);
-  border-radius: var(--radius-lg);
-  padding: 24px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
-.code-card__label { color: inherit; opacity: .75; }
-.code-card__code { font: 700 52px/1 var(--font-display); letter-spacing: .1em; color: var(--red); }
-.code-uses { margin: 0; padding-left: 22px; font-size: 18px; line-height: 1.5; }
-
-.countdown { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18vh 0 0; }
-.countdown__num { font: 700 180px/.9 var(--font-display); letter-spacing: -0.04em; color: var(--red); animation: ai-flash .6s cubic-bezier(.3,1.4,.5,1) both; }
-
-.question-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
-.ai-qimage img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.ai-option__text { min-width: 0; overflow-wrap: anywhere; }
+.code-sticker { font-size: 24px; align-self: flex-start; }
+/* «Спасибо!» в макете — 84px; на экранах уже 400px слово не влезает, поэтому не больше 21vw */
+.thanks { font-size: min(84px, 21vw); line-height: 1; }
+.offline { display: grid; gap: 8px; }
+.offline .q-tag { justify-self: start; }
+.offline .q-h { font-size: 20px; }
 
 /* Низкие экраны (iPhone SE, Android 360×640): пять длинных вариантов с картинкой
-   помещаются без прокрутки. Размеры шрифтов — не меньше минимума дизайн-системы. */
+   помещаются без прокрутки. Шрифты — не меньше минимума дизайн-системы (текст 18px, подписи 15px). */
 @media (max-height: 720px) {
-  .screen { gap: 8px; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
-  .hero { padding: 0; }
-  .hero .ai-pair { --ps: 128px; }
-  .title { font-size: 30px; }
-  .ai-qimage { height: 96px; }
-  .ai-question { font-size: 20px; line-height: 1.2; }
-  .ai-options { gap: 6px; }
-  .ai-option { min-height: 52px; padding: 4px 10px 4px 5px; gap: 10px; line-height: 1.2; }
-  .ai-option__key { width: 40px; height: 40px; font-size: 18px; }
-  .ai-timer { width: 46px; height: 46px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .countdown__num { animation: none; }
+  .q-screen { gap: 12px; }
+  .q-body { gap: 10px; }
+  .q-center { gap: 12px; }
+  .q-pic { aspect-ratio: auto; height: 104px; }
+  .q-pic > img { object-fit: contain; }
+  .q-h--question { font-size: 20px; }
+  .q-opts { gap: 6px; }
+  .q-opt { min-height: 52px; padding: 7px 12px; }
+  .q-count { font-size: 180px; }
 }
